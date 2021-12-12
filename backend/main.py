@@ -1,7 +1,6 @@
 import uvicorn
 from models import User as ModelUser
 from schema import User as SchemaUser
-from schema import Users
 from app import app
 from db import db
 

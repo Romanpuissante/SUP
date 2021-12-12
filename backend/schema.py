@@ -1,4 +1,3 @@
-from typing import Sequence
 from pydantic import BaseModel
 
 
