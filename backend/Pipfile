@@ -13,6 +13,9 @@ uvicorn = "*"
 python-dotenv = "*"
 databases = {extras = ["postgresql"], version = "*"}
 asyncpg = "*"
+fastapi-jwt-auth = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 

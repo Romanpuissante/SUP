@@ -24,8 +24,8 @@ config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-import models
-from db import metadata
+import orm.models
+from conf.db import metadata
 
 target_metadata = metadata
 

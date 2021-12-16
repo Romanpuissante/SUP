@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import sqlalchemy
 
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 load_dotenv(BASE_DIR.joinpath(".env"))
 
 db = Database(os.environ["DATABASE_URL"])
