@@ -1,5 +1,5 @@
 from orm.models import user
-from orm.schema import UserSchema, UserAuthSchema
+from orm.schema import UserFull
 from .crud import CRUD
 
 
@@ -7,7 +7,7 @@ from .crud import CRUD
 
 class UserService(CRUD):
     model = user
-    schema = UserSchema
+    schema = UserFull
 
 
 

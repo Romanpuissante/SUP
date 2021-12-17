@@ -7,8 +7,8 @@ from fastapi import (
 
 from fastapi_jwt_auth import AuthJWT
 
-from orm.schema import UserSchema
-from services.users import UserService, UserAuthSchema
+from orm.schema import UserFull
+from services.users import UserService
 
 router = APIRouter(
     prefix='',
@@ -16,12 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/user/")
-async def create_user(user: UserSchema):
-    return await UserService.create(**user.dict())
-
-
-@router.get("/user/{id}", response_model=UserSchema, operation_id="authorize")
+@router.get("/user/{id}", response_model=UserFull, operation_id="authorize")
 async def get_user(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     return await UserService.get(id)

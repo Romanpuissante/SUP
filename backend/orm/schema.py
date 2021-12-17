@@ -1,8 +1,28 @@
 from pydantic import BaseModel
 from typing import Optional
 
-
 # *Users 
+
+class BaseUserAuth(BaseModel):
+    username: str
+    password: str
+    
+
+
+class UserFull(BaseUserAuth):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    middle_name: Optional[str]
+    innerphone: Optional[str]
+    phone: Optional[str]
+    email: Optional[str]
+    superuser: Optional[bool] = False
+
+class UserLogin(BaseUserAuth):
+    pass
+
+
+
 
 class UserAuthSchema(BaseModel):
     username: str

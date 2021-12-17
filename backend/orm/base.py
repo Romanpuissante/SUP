@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Table, Integer
+from sqlalchemy import Column, Table, Integer, Sequence
 from conf.db import metadata
 
 
@@ -9,4 +9,3 @@ def create_table(name, columns: tuple):
         Column("id", Integer, primary_key=True, autoincrement=True),
         *columns,
     )
-

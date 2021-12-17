@@ -16,6 +16,7 @@ asyncpg = "*"
 fastapi-jwt-auth = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
+aioredis = "*"
 
 [dev-packages]
 

@@ -3,13 +3,12 @@ from passlib.hash import bcrypt
 from fastapi import (
     HTTPException,
     status,
-    Depends
 )
-from fastapi.security import OAuth2PasswordBearer
+
 from fastapi_jwt_auth import AuthJWT
 
 from orm.models import user
-from orm.schema import UserAuthSchema
+from orm.schema import UserFull, UserLogin
 from conf.db import db
 
 
@@ -23,13 +22,13 @@ class AuthService:
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
         return bcrypt.verify(plain_password, hashed_password)
 
-    async def register_new_user(self, user_data: UserAuthSchema):
+    async def register_new_user(self, user_data: UserFull):
         user_data.password = self.hash_password(user_data.password)
         query = user.insert().values(**user_data.dict())
         id_db = await db.execute(query)
         return { "id": id_db}
 
-    async def authenticate_user(self, user_data: UserAuthSchema, Authorize: AuthJWT):
+    async def authenticate_user(self, user_data: UserLogin, Authorize: AuthJWT):
 
         exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,14 +53,9 @@ class AuthService:
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
 
-
         return {"access_token": access_token, "refresh_token": refresh_token}
 
         
-
-
-
-
         # query = cls.model.select().where(cls.model.c.id == id)
         # result = await db.fetch_one(query)
         # return cls.schema(**result).dict()

@@ -11,13 +11,15 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
 
-  redis:  
+  redis:
+    container_name: redis
     image: redis
-    environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - REDIS_URL=${REDIS_URL}
+    volumes:
+        - ./redis/data:/data
+        - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     ports:
-      - "6379"
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -40,5 +42,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
 
   

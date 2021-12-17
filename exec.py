@@ -4,6 +4,7 @@ dictType = {
     'String': 'str',
     'Integer': 'int',
     'Text': 'str',
+    'Boolean': 'bool',
 }
 
 def converColumn(s):

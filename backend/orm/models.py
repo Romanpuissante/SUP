@@ -6,17 +6,12 @@ from .base import create_table
 user = create_table("user", (
     Column("username", String(100)),
     Column("password", String),
-    Column("first_name", String(100), nullable=True),
-    Column("last_name", String(100), nullable=True),
+    Column("first_name", String(100)),
+    Column("last_name", String(100)),
     Column("middle_name", String(100), nullable=True),
-    
+    Column("innerphone", String(50), nullable=True),
+    Column("phone", String(50), nullable=True),
+    Column("email", String(150), nullable=True),
+    Column("superuser", Boolean, default=False),
 ))
 
-
-
-# class Project(BaseModel):
-#     fields = (
-#         Column("name", String(150)),
-#         Column("description", Text()),
-#         Column("author", ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE")),
-#     )
