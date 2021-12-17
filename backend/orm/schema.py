@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 # *Users 
@@ -10,9 +11,9 @@ class UserAuthSchema(BaseModel):
 
 class UserSchema(BaseModel):
 
-    first_name: str = ""
-    last_name: str = ""
-    middle_name: str = ""
+    first_name: Optional[str]
+    last_name: Optional[str]
+    middle_name: Optional[str]
 
     class Config:
         orm_mode = True

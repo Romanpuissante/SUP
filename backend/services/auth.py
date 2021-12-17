@@ -3,7 +3,9 @@ from passlib.hash import bcrypt
 from fastapi import (
     HTTPException,
     status,
+    Depends
 )
+from fastapi.security import OAuth2PasswordBearer
 from fastapi_jwt_auth import AuthJWT
 
 from orm.models import user
@@ -46,8 +48,13 @@ class AuthService:
         if not self.verify_password(user_data.password, user_db["password"]):
             raise exception
 
-        access_token = Authorize.create_access_token(subject=user_db["username"], fresh=True)
+        access_token = Authorize.create_access_token(subject=user_db["username"])
         refresh_token = Authorize.create_refresh_token(subject=user_db["username"])
+        
+        Authorize.set_access_cookies(access_token)
+        Authorize.set_refresh_cookies(refresh_token)
+
+
         return {"access_token": access_token, "refresh_token": refresh_token}
 
         
