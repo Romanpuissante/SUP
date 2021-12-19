@@ -11,12 +11,13 @@ from orm.schema import UserFull
 from services.users import UserService
 
 router = APIRouter(
-    prefix='',
+    prefix='/user',
     tags=['User'],
+    
 )
 
 
-@router.get("/user/{id}", response_model=UserFull)
+@router.get("/{id}", response_model=UserFull)
 async def get_user(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     return await UserService.get(id)

@@ -17,7 +17,25 @@ def custom_openapi():
     openapi_schema = get_openapi(
         title="Async SUP",
         version="alfa 1.0.0",
-        description="Схема",
+        description="СхемАПИ",
+        tags = [
+    {
+        "name": "User",
+        "description": "Операции с пользователем",
+    },
+    {
+        "name": "Auth",
+        "description": "Работа с регистрацией, авторизацией и токенами",
+        "externalDocs": {
+            "description": "Пример внешней документации",
+            "url": "https://google.com/",
+        },
+    },
+],
+
+
+
+
         routes=app.routes,
     )
     headers = {
@@ -28,6 +46,7 @@ def custom_openapi():
             "title": "Authorization",
             "type": "string"
         },
+    
     }
 
     router_authorize = [route for route in app.routes[4:] if route.operation_id == "authorize"]
