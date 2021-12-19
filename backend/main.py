@@ -31,6 +31,10 @@ def custom_openapi():
             "url": "https://google.com/",
         },
     },
+    {
+        "name": "Project",
+        "description": "Проекты",
+    },
 ],
 
 

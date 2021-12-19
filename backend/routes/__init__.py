@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from . import (
     users,
-    auth
+    auth,
     # project
 )
 
