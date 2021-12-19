@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.get("/user/{id}", response_model=UserFull, operation_id="authorize")
+@router.get("/user/{id}", response_model=UserFull)
 async def get_user(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     return await UserService.get(id)

@@ -1,9 +1,14 @@
 import uvicorn
 from conf.app import app
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
 import routes
 
-app.include_router(routes.router)
+origins = [
+    "http://localhost:8080",
+]
+
+app.include_router(routes.router, prefix="/api")
 
 def custom_openapi():
     if app.openapi_schema:
@@ -37,7 +42,14 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-app.openapi = custom_openapi   
+app.openapi = custom_openapi
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+) 
 
 
 
