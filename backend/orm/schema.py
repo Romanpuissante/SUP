@@ -1,7 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
+
+# *Otdels
+
+class BaseOtdel(BaseModel):
+    id:Optional[int]
+    name: str
+
+
+
 # *Users 
+
 
 class BaseUserAuth(BaseModel):
     username: str
@@ -9,6 +20,7 @@ class BaseUserAuth(BaseModel):
     
 
 class UserInfoNoPwd(BaseModel):
+    
     username: str
     first_name: Optional[str]
     last_name: Optional[str]
@@ -16,6 +28,7 @@ class UserInfoNoPwd(BaseModel):
     innerphone: Optional[str]
     phone: Optional[str]
     email: Optional[str]
+    otdel: Optional[str]
     superuser: Optional[bool] = False
 
 class UserFull(BaseUserAuth, UserInfoNoPwd):

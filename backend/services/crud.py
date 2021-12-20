@@ -10,16 +10,22 @@ class CRUD:
     schema = None
 
     @classmethod
-    async def get(cls, id):
-        query = cls.model.select().where(cls.model.c.id == id)
+    async def get(cls, params:dict):
+        """
+        params={"field":'id',"searchval":id} \n
+        Метод принимает параметры поиска, в которых следует указать поле, по которому ищем и искомое значение \n
+        К выводу - один единственный результат
+        """
+        query = cls.model.select().where(cls.model.c[params["field"]] == params["searchval"])
         result = await db.fetch_one(query)
         return cls.schema(**result).dict()
 
+
     @classmethod
-    async def create(cls, **kwarg):
+    async def create(cls, **kwarg):        
         query = cls.model.insert().values(**kwarg)
-        result = await db.execute(query)
-        return { "id": result}
+        kwarg['id']  = await db.execute(query)
+        return kwarg
 
 
 

@@ -20,7 +20,7 @@ router = APIRouter(
 @router.get("/{id}", response_model=UserInfoNoPwd)
 async def get_user(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    return await UserService.get(id)
+    return await UserService.get(params={"field":'id',"searchval":id})
 
 # @router.get("/users/", response_model=List[])
 # async def get_users():

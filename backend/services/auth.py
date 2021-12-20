@@ -3,12 +3,14 @@ from passlib.hash import bcrypt
 from fastapi import (
     HTTPException,
     status,
+    Depends
 )
 
 from fastapi_jwt_auth import AuthJWT
-
+from .otdels import OtdelServ
 from orm.models import user
 from orm.schema import UserFull, UserLogin
+from .otdels import OtdelServ
 from conf.db import db
 
 
@@ -22,8 +24,11 @@ class AuthService:
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
         return bcrypt.verify(plain_password, hashed_password)
 
-    async def register_new_user(self, user_data: UserFull):
+    async def register_new_user(self,
+                user_data: UserFull):
         user_data.password = self.hash_password(user_data.password)
+        otdel= await OtdelServ.checkOtdel(user_data.otdel.lower().title())
+        user_data.otdel = otdel['id']
         query = user.insert().values(**user_data.dict())
         id_db = await db.execute(query)
         return { "id": id_db}
