@@ -33,6 +33,7 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
+    
     Authorize.set_access_cookies(new_access_token)
 
     return {"access_token": new_access_token}

@@ -49,13 +49,7 @@ class AuthService:
 
         access_token = Authorize.create_access_token(subject=user_db["username"])
         refresh_token = Authorize.create_refresh_token(subject=user_db["username"])
-        
-        Authorize.set_access_cookies(access_token)
+  
         Authorize.set_refresh_cookies(refresh_token)
 
-        return {"access_token": access_token, "refresh_token": refresh_token}
-
-        
-        # query = cls.model.select().where(cls.model.c.id == id)
-        # result = await db.fetch_one(query)
-        # return cls.schema(**result).dict()
+        return { "access_token": access_token, "user": {k:v for k,v in user_db.items() if k != 'password'} }
