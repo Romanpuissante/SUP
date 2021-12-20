@@ -3,6 +3,7 @@ from sqlalchemy import Table
 
 
 
+
 class CRUD:
 
     model: Table

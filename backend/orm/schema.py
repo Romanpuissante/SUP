@@ -8,8 +8,8 @@ class BaseUserAuth(BaseModel):
     password: str
     
 
-
-class UserFull(BaseUserAuth):
+class UserInfoNoPwd(BaseModel):
+    username: str
     first_name: Optional[str]
     last_name: Optional[str]
     middle_name: Optional[str]
@@ -18,37 +18,27 @@ class UserFull(BaseUserAuth):
     email: Optional[str]
     superuser: Optional[bool] = False
 
-class UserLogin(BaseUserAuth):
+class UserFull(BaseUserAuth, UserInfoNoPwd):
     pass
 
-
-
-
-class UserAuthSchema(BaseModel):
-    username: str
-    password: str
-    
-
-class UserSchema(BaseModel):
-
-    first_name: Optional[str]
-    last_name: Optional[str]
-    middle_name: Optional[str]
+class UserLogin(BaseUserAuth):
+    pass
 
     class Config:
         orm_mode = True
 
+
 # *Project
 
-class ProjectSchema(BaseModel):
-    name: str
-    description: str
-    author: int
+# class ProjectSchema(BaseModel):
+#     name: str
+#     description: str
+#     author: int
 
 
-class ProjectGet(BaseModel):
-    name: str
-    description: str
-    author: UserSchema
+# class ProjectGet(BaseModel):
+#     name: str
+#     description: str
+#     author: UserSchema
 
 
