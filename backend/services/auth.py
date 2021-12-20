@@ -12,7 +12,6 @@ from .positions import PositionsService
 from .ranks import RanksService
 from orm.models import user
 from orm.schema import UserFull, UserLogin
-
 from conf.db import db
 
 
@@ -34,7 +33,7 @@ class AuthService:
         dicter = {"otdel": OtdelService,
                   "position":PositionsService,
                   "rank":RanksService
-        }
+                    }
         user_data=user_data.dict()
         newdict={}
         for key,val in dicter.items():

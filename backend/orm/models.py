@@ -1,16 +1,20 @@
-from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, ARRAY
+from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, ARRAY, Date
 from .base import create_table
+# *Positions PROJECT
+projectstatuses = create_table("projectstatuses",(
+    Column("name", String(100), unique=True),    
+) )
 
-# *Positions
+# *Positions USER
 positions = create_table("positions",(
     Column("name", String(100), unique=True),    
 ) )
 
-#  *Ranks
+#  *Ranks USER
 ranks = create_table("ranks",(
     Column("name", String(100), unique=True),    
 ) )
-# *Otdels
+# *Otdels USER
 
 otdels = create_table("otdels",(
     Column("name", String(100), unique=True),    
@@ -33,5 +37,19 @@ user = create_table("user", (
     Column('rank', Integer, ForeignKey("ranks.id"), nullable=True),
     Column("hardskills", ARRAY(Integer)),
     Column("softskills", ARRAY(Integer)),
+))
+
+project = create_table("projects",(
+    Column("name", String(255)),
+    Column("description", Text),
+    Column("status", Integer, ForeignKey("projectstatuses.id"), nullable=False),
+    Column("customer", String(100)),
+    Column("author", Integer, ForeignKey("user.id"), nullable=False),
+    Column("leader", Integer, ForeignKey("user.id"), nullable=False),
+    Column("datestart", Date, nullable=True),
+    Column("dateend", Date, nullable=True),
+    Column("lastchanged", Date, nullable=True),
+    
+
 ))
 

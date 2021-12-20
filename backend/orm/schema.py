@@ -1,5 +1,10 @@
+from datetime import date
 from pydantic import BaseModel
 from typing import Optional
+#  *ProjectStatuses
+class BaseProjectstatuses(BaseModel):
+    id: int
+    name: str
 
 # *Positions
 
@@ -50,10 +55,11 @@ class UserLogin(BaseUserAuth):
 
 # *Project
 
-# class ProjectSchema(BaseModel):
-#     name: str
-#     description: str
-#     author: int
+class ProjectSchema(BaseModel):
+    name: str    
+    status: int
+    dateend: date
+    lastchanged:date
 
 
 # class ProjectGet(BaseModel):

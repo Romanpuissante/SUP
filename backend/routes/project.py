@@ -4,8 +4,8 @@ from fastapi import (
     Depends
 )
 
-from orm.models import Project
-from orm.schema import ProjectSchema, ProjectGet
+from orm.models import project
+from orm.schema import ProjectSchema
 
 router = APIRouter(
     prefix='/project',
