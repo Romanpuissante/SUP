@@ -22,13 +22,24 @@ class CRUD:
 
 
     @classmethod
-    async def create(cls, **kwarg):        
+    async def create(cls, **kwarg):  
+        """
+        Возвращает весь созданный объект, а не только его ID
+        """      
         query = cls.model.insert().values(**kwarg)
         kwarg['id']  = await db.execute(query)
         return kwarg
 
 
-
+    @classmethod
+    async def checkForeign(cls,name:str)->int:
+        """Проверка форинов по полю name - названию. Если отсутствует - добавляется в базу данных"""
+        query = cls.model.select().where(cls.model.c.name == name)
+        result =  await db.fetch_one(query)   
+        
+        if result==None:            
+            result = await cls.create(name=name)             
+        return  cls.schema(**result).dict()['id']
 
     
 

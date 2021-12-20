@@ -7,10 +7,12 @@ from fastapi import (
 )
 
 from fastapi_jwt_auth import AuthJWT
-from .otdels import OtdelServ
+from .otdels import OtdelService
+from .positions import PositionsService
+from .ranks import RanksService
 from orm.models import user
 from orm.schema import UserFull, UserLogin
-from .otdels import OtdelServ
+
 from conf.db import db
 
 
@@ -26,10 +28,20 @@ class AuthService:
 
     async def register_new_user(self,
                 user_data: UserFull):
+
         user_data.password = self.hash_password(user_data.password)
-        otdel= await OtdelServ.checkOtdel(user_data.otdel.lower().title())
-        user_data.otdel = otdel['id']
-        query = user.insert().values(**user_data.dict())
+
+        dicter = {"otdel": OtdelService,
+                  "position":PositionsService,
+                  "rank":RanksService
+        }
+        user_data=user_data.dict()
+        newdict={}
+        for key,val in dicter.items():
+            newdict[key]= await val.checkForeign(user_data[key].lower().title())        
+        user_data = user_data | newdict
+        
+        query = user.insert().values(**user_data)
         id_db = await db.execute(query)
         return { "id": id_db}
 
