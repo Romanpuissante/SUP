@@ -15,12 +15,12 @@ router = APIRouter(
 )
 
 
-@router.post('/register/', status_code=status.HTTP_201_CREATED)
+@router.post('/register', status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserFull, auth_service: AuthService = Depends()):
     """ Регистрация пользователя """
     return await auth_service.register_new_user(user_data)
 
-@router.post('/login/')
+@router.post('/login')
 async def login(user_data: UserLogin, auth_service: AuthService = Depends(), Authorize: AuthJWT = Depends()):
     """ Вход на сайт """
     return await auth_service.authenticate_user(user_data, Authorize)
@@ -36,3 +36,9 @@ def refresh(Authorize: AuthJWT = Depends()):
     Authorize.set_access_cookies(new_access_token)
 
     return {"access_token": new_access_token}
+
+@router.get('/logout')
+async def logout(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    Authorize.unset_jwt_cookies()
+    return {"msg":"Successfully logout"}

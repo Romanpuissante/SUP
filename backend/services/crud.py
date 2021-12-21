@@ -1,3 +1,4 @@
+from typing import Optional
 from conf.db import db
 from sqlalchemy import Table
 
@@ -14,13 +15,16 @@ class CRUD:
         """
         params={"field":'id',"searchval":id} \n
         Метод принимает параметры поиска, в которых следует указать поле, по которому ищем и искомое значение \n
-        К выводу - один единственный результат
         """
-        query = cls.model.select().where(cls.model.c[params["field"]] == params["searchval"])
+       
+        query = cls.model.select().where(cls.model.c[params["field"]] == params["searchval"])               
         result = await db.fetch_one(query)
         return cls.schema(**result).dict()
 
-
+    # @classmethod
+    # async def get_list(cls, filters: Optional[OperationFilter])
+    #     pass
+      
     @classmethod
     async def create(cls, **kwarg):  
         """

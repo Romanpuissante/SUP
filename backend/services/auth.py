@@ -63,8 +63,8 @@ class AuthService:
         if not self.verify_password(user_data.password, user_db["password"]):
             raise exception
 
-        access_token = Authorize.create_access_token(subject=user_db["username"])
-        refresh_token = Authorize.create_refresh_token(subject=user_db["username"])
+        access_token = Authorize.create_access_token(subject=user_db["id"])
+        refresh_token = Authorize.create_refresh_token(subject=user_db["id"])
         
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)

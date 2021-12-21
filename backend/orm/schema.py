@@ -26,6 +26,7 @@ class BaseOtdel(BaseModel):
 
 # *Users 
 class BaseUserAuth(BaseModel):
+    
     username: str
     password: str
     
@@ -47,7 +48,9 @@ class UserFull(BaseUserAuth, UserInfoNoPwd):
     pass
 
 class UserLogin(BaseUserAuth):
+    
     pass
+    
 
     class Config:
         orm_mode = True
@@ -55,11 +58,14 @@ class UserLogin(BaseUserAuth):
 
 # *Project
 
-class ProjectSchema(BaseModel):
+class BaseProject(BaseModel):
+    id: int
     name: str    
     status: int
     dateend: date
     lastchanged:date
+    tasksCompleted: Optional[int]=None
+    tasksAll: Optional[int]=None
 
 
 # class ProjectGet(BaseModel):

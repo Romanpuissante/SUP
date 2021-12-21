@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, ForeignKey, Integer, Boolean, Text, ARRAY, Date
 from .base import create_table
-# *Positions PROJECT
+# *Statuses PROJECT
 projectstatuses = create_table("projectstatuses",(
     Column("name", String(100), unique=True),    
 ) )
