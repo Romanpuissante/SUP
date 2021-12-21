@@ -5,7 +5,6 @@ from fastapi import (
 )
 from fastapi_jwt_auth import AuthJWT
 
-
 from orm.schema import UserFull, UserLogin
 from services.auth import AuthService
 
@@ -32,8 +31,6 @@ def refresh(Authorize: AuthJWT = Depends()):
     Authorize.jwt_refresh_token_required()
 
     current_user = Authorize.get_jwt_subject()
-    new_access_token = Authorize.create_access_token(subject=current_user)
-    
-    Authorize.set_access_cookies(new_access_token)
+    new_access_token = 'Bearer ' + Authorize.create_access_token(subject=current_user, fresh=True)
 
     return {"access_token": new_access_token}

@@ -2,10 +2,11 @@ from typing import List
 
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
 )
 
 from fastapi_jwt_auth import AuthJWT
+from conf.jwt import APIAuth
 
 from orm.schema import UserFull
 from services.users import UserService
@@ -17,7 +18,8 @@ router = APIRouter(
 
 
 @router.get("/user/{id}", response_model=UserFull)
-async def get_user(id: int, Authorize: AuthJWT = Depends()):
+async def get_user(id: int, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
+  
     Authorize.jwt_required()
     return await UserService.get(id)
 

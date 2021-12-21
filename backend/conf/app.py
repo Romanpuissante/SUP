@@ -8,7 +8,7 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from .db import db, redis
 from .jwt import give_secret
 
-app = FastAPI()
+app = FastAPI(title="Async SUP", version="alfa 1.0.0", description="Схема")
 
 
 # !JWT section
@@ -17,8 +17,6 @@ class Settings(BaseModel):
     authjwt_token_location: set = {'headers', 'cookies'}
     authjwt_cookie_csrf_protect: bool = False
     authjwt_cookie_secure: bool = False
-    authjwt_access_token_expires: int = 30
-    authjwt_refresh_token_expires: int = 120
     authjwt_cookie_samesite: str = 'lax'
 
 @AuthJWT.load_config
