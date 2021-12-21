@@ -18,6 +18,8 @@ passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 aioredis = "*"
 broadcaster = {extras = ["redis"], version = "*"}
+requests = "*"
+pytest = "*"
 
 [dev-packages]
 

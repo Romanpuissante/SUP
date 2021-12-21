@@ -3,7 +3,6 @@ from orm.models import  projectstatuses
 from orm.schema import BaseProjectstatuses
 from .crud import CRUD
 from typing import Optional
-from conf.db import db
 from sqlalchemy import Table
 
 

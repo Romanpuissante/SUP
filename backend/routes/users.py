@@ -24,11 +24,11 @@ router = APIRouter(
 # async def get_user(id: int, user_id = Depends(currentuserID)):        
 #     return await UserService.get(params={"field":'id',"searchval":id})
 
-@router.get("/user/{id}", response_model=UserFull)
+@router.get("/{id}", response_model=UserFull)
 async def get_user(id: int, user_id = Depends(currentuserID)):
     print(user_id)
     
-    return await UserService.get(id)
+    return await UserService.get()
 
 # @router.get("/users/", response_model=List[UserSchema])
 # @router.get("/users/", response_model=List[])
