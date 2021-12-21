@@ -9,7 +9,6 @@ from orm.models import project
 from orm.schema import BaseProject,BaseProjectstatuses
 from services.projects import ProjectService
 from services.projectstatus import ProjectstatussService
-from services.depends import currentuserID
 router = APIRouter(
     prefix='/project',
     tags=['Project'],
@@ -21,13 +20,13 @@ router = APIRouter(
 
 
 # operation_id="authorize"
-@router.get("/")
-async def get_all_projects(
-            user_id = Depends(currentuserID),
-            filterstatus: Optional[Depends()]=None):
-    print(user_id)
-    projectsList = await ProjectService.get_list(params={"field":"", 'searchval':""})
-    return []
+# @router.get("/")
+# async def get_all_projects(
+#             user_id = Depends(currentuserID),
+#             filterstatus: Optional[Depends()]=None):
+#     print(user_id)
+#     projectsList = await ProjectService.get_list(params={"field":"", 'searchval':""})
+#     return []
 
 # @router.get("/")
 # async def get_all_projects(user_id = Depends(currentuserID)):
