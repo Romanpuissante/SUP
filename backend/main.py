@@ -1,8 +1,8 @@
 import uvicorn
 from conf.app import app
-from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 import routes
+from routes.consumers import router as ws_router
 
 origins = [
     "http://localhost:8080",
@@ -10,6 +10,8 @@ origins = [
 ]
 
 app.include_router(routes.router, prefix="/api")
+app.include_router(ws_router, prefix="")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,7 +19,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-) 
+)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+

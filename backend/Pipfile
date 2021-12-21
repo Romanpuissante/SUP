@@ -9,7 +9,7 @@ fastapi-sqlalchemy = "*"
 pydantic = "*"
 alembic = "*"
 psycopg2 = "*"
-uvicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 python-dotenv = "*"
 databases = {extras = ["postgresql"], version = "*"}
 asyncpg = "*"
@@ -17,6 +17,7 @@ fastapi-jwt-auth = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 aioredis = "*"
+broadcaster = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 
