@@ -1,4 +1,5 @@
 import re, sys, os, secrets
+from dotenv import load_dotenv
 
 dictType = {
     'String': 'str',
@@ -68,6 +69,30 @@ class Exec():
         if len(args) == 2:
             n = args[1]
         print(secrets.token_urlsafe(int(n)))
+
+    @classmethod    
+    def pg_dump(cls,args):
+       """
+        Создание дампа БД 
+       """ 
+       import datetime
+       load_dotenv()
+       n = input("Название для файла:\n")
+      
+       if n=="":
+           n=f'{datetime.date.today()}' 
+       os.system(f'docker exec postgresql_db pg_dump -U {os.environ["DB_USER"]} --data-only -F t {os.environ["DB_NAME"]}  >backups/{n}.sql')
+       print("Файл дампа базы создан")
+
+    @classmethod
+    def pg_restore(cls,args):
+        load_dotenv()
+        n = input("Название для файла:\n")
+        if n=="":
+            raise Exception("Надо имя файла")
+        os.system(f'docker exec -i postgresql_db pg_restore -U {os.environ["DB_USER"]} -v -c -d  {os.environ["DB_NAME"]} < backups/{n}.sql')
+        print("OK!")
+
 
 if __name__ == "__main__":
 
