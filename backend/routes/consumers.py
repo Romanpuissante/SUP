@@ -6,6 +6,7 @@ from fastapi import (
     Query,
     status
 )
+import json
 import asyncio
 import async_timeout
 import aioredis
@@ -74,7 +75,7 @@ async def websocket(websocket: WebSocket):
 
             future = asyncio.create_task(reader(pubsub, websocket))
 
-            await redis.publish("channel:1", "Hello")
+            await redis.publish("channel:1", json.dumps(data))
             await redis.publish("channel:2", "World")
             await redis.publish("channel:1", STOPWORD)
 
