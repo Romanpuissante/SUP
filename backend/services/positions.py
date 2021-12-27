@@ -1,9 +1,9 @@
 
-from orm.models import  positions
-from orm.schema import BasePositions
-from .crud import CRUD
+# from orm.models import  positions
+# from orm.schema import BasePositions
+# from .crud import CRUD
 
 
-class PositionsService(CRUD):
-    model = positions
-    schema = BasePositions
+# class PositionsService(CRUD):
+#     model = positions
+#     schema = BasePositions

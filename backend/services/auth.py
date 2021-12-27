@@ -1,71 +1,82 @@
+from typing import Type
+
 from passlib.hash import bcrypt
-
-from fastapi import (
-    HTTPException,
-    status,
-    Depends
-)
-
 from fastapi_jwt_auth import AuthJWT
-from .otdels import OtdelService
-from .positions import PositionsService
-from .ranks import RanksService
-from orm.models import user
-from orm.schema import UserFull, UserLogin
-from conf.db import db
+
+from orm.models import User
+from orm.schema import UserRegister, UserFull, UserLogin, UserSimple, UserAuth
+from .base import BaseServices
+from services.dicts import OtdelService, PositionService, RankService
+from conf.exeptions import unauthError, usernameError
 
 
-class AuthService:
-    
+class tableFK(object):
+    def __init__(self, db):
+        self.fk = {
+            "otdel": OtdelService(db),
+            "position": PositionService(db),
+            "rank": RankService(db)
+        }
+
+class AuthService(BaseServices[UserRegister, UserFull, User]):
+
+    @property
+    def _in_schema(self) -> Type[UserFull]:
+        return UserRegister
+
+    @property
+    def _schema(self) -> Type[UserFull]:
+        return UserFull
+
+    @property
+    def _table(self) -> Type[User]:
+        return User
+
+    @property
+    def _tableFK(self) -> tableFK:
+        return tableFK(self._db_session)
+
     @classmethod
     def hash_password(cls, password: str) -> str:
         return bcrypt.hash(password)
 
     @classmethod
+    def create_access(cls, Authorize: AuthJWT, user: dict) -> str:
+        return 'Bearer ' + Authorize.create_access_token(subject=user.username, user_claims= {"user": {k:v for k,v in user.dict().items() if k != 'password'}})
+
+    @classmethod
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
         return bcrypt.verify(plain_password, hashed_password)
 
-    async def register_new_user(self,
-                user_data: UserFull):
-
-        user_data.password = self.hash_password(user_data.password)
-
-        dicter = {"otdel": OtdelService,
-                  "position":PositionsService,
-                  "rank":RanksService
-                    }
-        user_data=user_data.dict()
-        newdict={}
-        for key,val in dicter.items():
-            newdict[key]= await val.checkForeign(user_data[key].lower().title())        
-        user_data = user_data | newdict
+    async def create(self, in_schema: UserRegister) -> UserFull:
         
-        query = user.insert().values(**user_data)
-        id_db = await db.execute(query)
-        return { "id": id_db}
+        in_schema.password = self.hash_password(in_schema.password)
+        user: UserSimple = await self.get_with_filter({"username": in_schema.username}, UserSimple)
+        if user:
+            raise usernameError
 
-    async def authenticate_user(self, user_data: UserLogin, Authorize: AuthJWT):
-
-        exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Некоректные имя пользователя или пароль',
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
+        in_schema = await self.check_foreign_key(in_schema)
+        entry = self._table(**in_schema)
+        self._db_session.add(entry)
         
-        query = user.select().where(user.c.username == user_data.username)
-        user_db = await db.fetch_one(query)
+        await self._db_session.commit()
+      
+        return self._schema.from_orm(entry)
 
-        if not user_db:
-            raise exception
 
-        user_db = dict(user_db)
+    async def auth_user(self, user_data: UserLogin, Authorize: AuthJWT): 
 
-        if not self.verify_password(user_data.password, user_db["password"]):
-            raise exception
+        user: UserAuth = await self.get_with_filter({"username": user_data.username}, UserAuth)
 
-        access_token = 'Bearer ' + Authorize.create_access_token(subject=user_db["username"])
-        refresh_token = Authorize.create_refresh_token(subject=user_db["username"])
+        if not user:
+            raise unauthError
+
+        if not self.verify_password(user_data.password, user.password):
+            raise unauthError
+
+        access_token = self.create_access(Authorize, user)
+        refresh_token = Authorize.create_refresh_token(subject=user.username)
   
         Authorize.set_refresh_cookies(refresh_token)
 
-        return { "access_token": access_token, "user": {k:v for k,v in user_db.items() if k != 'password'} }
+        return { "access_token": access_token }

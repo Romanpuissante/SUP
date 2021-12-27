@@ -1,19 +1,19 @@
 
-from fastapi import (
-    APIRouter,
-    Depends
-)
-from typing import Optional
-from fastapi_jwt_auth import AuthJWT
-from orm.models import project
-from orm.schema import BaseProject,BaseProjectstatuses
-from services.projects import ProjectService
-from services.projectstatus import ProjectstatussService
-router = APIRouter(
-    prefix='/project',
-    tags=['Project'],
+# from fastapi import (
+#     APIRouter,
+#     Depends
+# )
+# from typing import Optional
+# from fastapi_jwt_auth import AuthJWT
+# from orm.models import project
+# from orm.schema import BaseProject,BaseProjectstatuses
+# from services.projects import ProjectService
+# from services.projectstatus import ProjectstatussService
+# router = APIRouter(
+#     prefix='/project',
+#     tags=['Project'],
     
-)
+# )
 
 
 

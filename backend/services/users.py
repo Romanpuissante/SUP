@@ -1,13 +1,13 @@
-from orm.models import user
-from orm.schema import UserInfoNoPwd
-from .crud import CRUD
+# from orm.models import user
+# from orm.schema import UserInfoNoPwd
+# from .crud import CRUD
 
 
 
 
-class UserService(CRUD):
-    model = user
-    schema = UserInfoNoPwd
+# class UserService(CRUD):
+#     model = user
+#     schema = UserInfoNoPwd
 
 
 

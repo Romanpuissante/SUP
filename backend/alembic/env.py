@@ -22,12 +22,14 @@ config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
 
+from orm.base import Base
 import orm.models
-from conf.db import metadata
 
-target_metadata = metadata
+
+target_metadata = Base.metadata
+
+fileConfig(config.config_file_name)
 
 
 def run_migrations_offline():

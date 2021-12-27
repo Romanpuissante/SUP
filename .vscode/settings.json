@@ -1,7 +1,7 @@
 {
     "files.exclude": {
         // "**/backend/Pipfile": true,
-    //   "**/backend/Pipfile.lock": true,
+        // "**/backend/Pipfile.lock": true,
         "**/backend/alembic.ini": true,
         "**/backend/__init__.py": true,
         "**/backend/alembic/script.py.mako": true,

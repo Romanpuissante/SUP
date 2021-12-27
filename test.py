@@ -1,15 +1,6 @@
-class A():
-
-    def b(self):
-        pass
 
 
-class B(A):
+a = ('a', 234)
 
-    def b(self):
-        print(1)
-
-
-b = B()
-
-b.b()
+key, val = a
+print( key, val)
