@@ -31,12 +31,12 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 # !Event app
-@app.on_event("startup")
-async def startup():
-    await broadcast.connect()
+# @app.on_event("startup")
+# async def startup():
+#     await broadcast.connect()
     
 
-@app.on_event("shutdown")
-async def shutdown():
-    await redis.close()
-    await broadcast.disconnect()
+# @app.on_event("shutdown")
+# async def shutdown():
+#     await redis.close()
+#     await broadcast.disconnect()
