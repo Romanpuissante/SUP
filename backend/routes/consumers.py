@@ -40,6 +40,7 @@ router = APIRouter(
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
+    
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -60,31 +61,43 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 @router.websocket("/")
-async def websocket(websocket: WebSocket):
-    client_id=1
-    # token: str = Query(...), Authorize: AuthJWT = Depends()   
+async def websocket(websocket: WebSocket, token: str = Query(...),Authorize: AuthJWT = Depends() ):
     await manager.connect(websocket)
+    # token: str = Query(...), Authorize: AuthJWT = Depends()   
     try:
-        while True:
-            data = await websocket.receive_json(mode="text")
-            print(data)            
-            print("отправлено")
-           
-            pubsub = redis.pubsub()
-            await pubsub.subscribe("channel:1", "channel:2")
-
-            future = asyncio.create_task(reader(pubsub, websocket))
-
-            await redis.publish("channel:1", json.dumps(data))
-            await redis.publish("channel:2", "World")
-            await redis.publish("channel:1", STOPWORD)
-
-            await future
-           
+        token = token.replace('Bearer ', '')
+        Authorize.jwt_required("websocket", token=token)
+        user_id = Authorize.get_raw_jwt(token)['user']['id']
+        print(user_id)
+                
+        
+        
+        try:
             
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"Client # left the chat")
+            while True:
+                data = await websocket.receive_json(mode="text")
+                print(data)            
+                print("отправлено")
+            
+                pubsub = redis.pubsub()
+
+                
+                await pubsub.subscribe("channel:1", "channel:2")
+
+                future = asyncio.create_task(reader(pubsub, websocket))
+
+                await redis.publish("channel:1", json.dumps(data))
+                await redis.publish("channel:2", "World")
+                await redis.publish("channel:1", STOPWORD)
+
+                await future
+            
+                
+        except WebSocketDisconnect:
+            manager.disconnect(websocket)
+            await manager.broadcast(f"Client # left the chat")
+    except AuthJWTException as err:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 #     try:
 
 #         token = token.replace('Bearer ', '')
