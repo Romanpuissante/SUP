@@ -19,6 +19,5 @@ engine = create_async_engine(
 
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-
-redis = aioredis.from_url("redis://redis", decode_responses=True)
-broadcast = Broadcast("redis://redis")
+async def get_redis_pool():
+    return await aioredis.from_url("redis://redis", encoding="utf-8", decode_responses=True)
