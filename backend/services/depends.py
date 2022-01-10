@@ -1,9 +1,17 @@
-
 from fastapi_jwt_auth import AuthJWT
-from fastapi import Depends
+from fastapi_jwt_auth.exceptions import AuthJWTException
+from fastapi import (
+    Depends,
+    Query,
+    status,
+    WebSocket,
+)
+
+
 from conf.jwt import APIAuth
 from orm.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+
 
 class AD():
 
@@ -23,4 +31,19 @@ class AD():
         current_user = Authorize.get_jwt_subject()
 
         return current_user
+
+    @classmethod
+    async def protect_ws(cls, websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):
+
+        await websocket.accept()
+        try:
+            token = token.replace('Bearer ', '')
+            Authorize.jwt_required("websocket", token=token)
+            return Authorize.get_raw_jwt(token)['user']
+
+        except AuthJWTException as err:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return None
+
+        
 

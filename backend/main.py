@@ -2,7 +2,7 @@ import uvicorn
 from conf.app import app
 from fastapi.middleware.cors import CORSMiddleware
 import routes
-# from routes.consumers import router as ws_router
+from routes.consumers import router as ws_router
 
 origins = [
     "http://localhost:8080",
@@ -10,7 +10,7 @@ origins = [
 ]
 
 app.include_router(routes.router, prefix="/api")
-# app.include_router(ws_router, prefix="")
+app.include_router(ws_router, prefix="")
 
 
 app.add_middleware(

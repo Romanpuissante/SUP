@@ -5,8 +5,9 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
-from .sessions import redis, broadcast
 from .jwt import give_secret
+
+
 
 app = FastAPI(title="Async SUP", version="alfa 1.0.0", description="Схема")
 
@@ -31,12 +32,10 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 # !Event app
-@app.on_event("startup")
-async def startup():
-    await broadcast.connect()
+# @app.on_event("startup")
+# async def startup():
+
     
 
-@app.on_event("shutdown")
-async def shutdown():
-    await redis.close()
-    await broadcast.disconnect()
+# @app.on_event("shutdown")
+# async def shutdown():
