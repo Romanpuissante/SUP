@@ -43,6 +43,7 @@ async def refresh(Authorize: AuthJWT = Depends(), auth_service: AuthService = De
 async def logout(Authorize: AuthJWT = Depends()):
 
     Authorize.jwt_required()
+    
     Authorize.unset_jwt_cookies()
     return {"msg":"Successfully logout"}
 

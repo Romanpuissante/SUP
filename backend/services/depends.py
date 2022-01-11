@@ -1,3 +1,4 @@
+from logging import log
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi import (
@@ -9,6 +10,7 @@ from fastapi import (
 
 
 from conf.jwt import APIAuth
+from conf.log import logger
 from orm.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,9 +43,14 @@ class AD():
             Authorize.jwt_required("websocket", token=token)
             return Authorize.get_raw_jwt(token)['user']
 
-        except AuthJWTException as err:
+        except AuthJWTException:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return None
+        except Exception as e:
+            logger.exception(e)
+            return None
+
+
 
         
 
