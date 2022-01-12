@@ -1,29 +1,31 @@
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
+    status
 )
-from services.depends import AD
 
-from services.base import BaseServices
-from orm.schema import BaseProject
-from orm.models import Projects
-from services.projects import ProjectService
+from orm.models import Otdel, User
+from services.auth import AuthService
+from orm.schema import UserRegister
 
 router = APIRouter(
     prefix='/test',
     tags=['Всяческое тестирование'], 
     
 )
-AS = AD(ProjectService)
+# AS = AD(ProjectService)
 
-@router.get("/")
-async def get_my_projects(project_service: ProjectService = Depends(AS.serv), username:str = Depends(AS.protect)):
-    myproj = await project_service.all()
-    
-    print (myproj)
-    return {"mess":myproj}
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def get_my_projects(user_data: UserRegister):
+    o = await AuthService().create(user_data)
+    print(o)
+    return {"mess": o}
 
-
+# @router.post('/auth/register', status_code=status.HTTP_201_CREATED, response_model=UserFull, tags=['Авторизация'])
+# async def register(user_data: UserRegister, auth_service: AuthService = Depends(AS.serv)):
+#     """ Регистрация пользователя """
+ 
+#     return await auth_service.create(user_data)
 
 # await ProjectService.get_list(params={"field":"", 'searchval':""})
 

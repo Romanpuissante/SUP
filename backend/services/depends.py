@@ -11,8 +11,8 @@ from fastapi import (
 
 from conf.jwt import APIAuth
 from conf.log import logger
-from orm.db import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
+# from orm.db import get_db
+# from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AD():
@@ -20,19 +20,19 @@ class AD():
     def __init__(self, service=None) -> None:
         self.service = service
 
-    async def serv(self, db: AsyncSession = Depends(get_db)):
-        return self.service(db)
+    # async def serv(self, db: AsyncSession = Depends(get_db)):
+    #     return self.service(db)
 
-    async def protect(self, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
-        """
-            Требует авторизацию и возвращает текущего пользователя.
-            вызов - в аргументы функции передать user_id = Depends(cls.protect)
-        """
+    # async def protect(self, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
+    #     """
+    #         Требует авторизацию и возвращает текущего пользователя.
+    #         вызов - в аргументы функции передать user_id = Depends(cls.protect)
+    #     """
 
-        Authorize.jwt_required()
-        current_user = Authorize.get_jwt_subject()
+    #     Authorize.jwt_required()
+    #     current_user = Authorize.get_jwt_subject()
 
-        return current_user
+    #     return current_user
 
     @classmethod
     async def protect_ws(cls, websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):

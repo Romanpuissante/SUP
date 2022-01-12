@@ -1,13 +1,13 @@
-from typing import Type
+# from typing import Type
 
-from passlib.hash import bcrypt
-from fastapi_jwt_auth import AuthJWT
+# from passlib.hash import bcrypt
+# from fastapi_jwt_auth import AuthJWT
 
-from orm.models import Projects
-from orm.schema import BaseProject, UserFull, UserLogin, UserSimple, UserAuth
-from .base import BaseServices
-from services.dicts import OtdelService, PositionService, RankService
-from conf.exeptions import unauthError, usernameError
+# from orm.models import Projects
+# from orm.schema import BaseProject, UserFull, UserLogin, UserSimple, UserAuth
+# from .base import BaseServices
+# from services.dicts import OtdelService, PositionService, RankService
+# from conf.exeptions import unauthError, usernameError
 
 
 # class tableFK(object):
@@ -18,13 +18,13 @@ from conf.exeptions import unauthError, usernameError
 #             "rank": RankService(db)
 #         }
 
-class ProjectService(BaseServices[BaseProject,BaseProject, Projects]):
-    @property
-    def _table(self) -> Type[Projects]:
-        return Projects
-    @property
-    def _schema(self) -> Type[BaseProject]:
-        return BaseProject
+# class ProjectService(BaseServices[BaseProject,BaseProject, Projects]):
+#     @property
+#     def _table(self) -> Type[Projects]:
+#         return Projects
+#     @property
+#     def _schema(self) -> Type[BaseProject]:
+#         return BaseProject
 
 
     # @property

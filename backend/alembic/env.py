@@ -3,6 +3,7 @@ from ntpath import join
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import create_engine
 
 from alembic import context
 
@@ -23,11 +24,11 @@ config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 
-from orm.base import Base
+from conf.sessions import metadata
 import orm.models
 
 
-target_metadata = Base.metadata
+target_metadata = metadata
 
 fileConfig(config.config_file_name)
 

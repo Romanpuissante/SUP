@@ -4,12 +4,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from conf.sessions import database, metadata
 
 from .jwt import give_secret
 
 
 
 app = FastAPI(title="Async SUP", version="alfa 1.0.0", description="Схема")
+app.state.database = database
 
 
 # !JWT section
@@ -32,10 +34,16 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 # !Event app
-# @app.on_event("startup")
-# async def startup():
+@app.on_event("startup")
+async def startup() -> None:
 
+    database_: database = app.state.database
+    if not database_.is_connected:
+        await database_.connect()
     
 
-# @app.on_event("shutdown")
-# async def shutdown():
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    database_: database = app.state.database
+    if database_.is_connected:
+        await database_.disconnect()
