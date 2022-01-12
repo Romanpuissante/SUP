@@ -20,14 +20,14 @@ router = APIRouter(
 @router.websocket("/")
 async def websocketwork(websocket: WebSocket, user=Depends(AD.protect_ws)):
     
-    if user:
+    if not  user:
+        return
 
-        async def consumer(message):
+    async def consumer(message):
 
-            return {
-                f"user:{user['id']}": message,
-                "main": "hello"
-            }
-            
-            
-        await RedisWorker.create_channels(websocket, consumer, channels=(f"user:{user['id']}", "main"))
+        return {
+            f"user:{user['id']}": message,
+            "main": "hello"
+        }
+        
+    await RedisWorker.create_channels(websocket, consumer, channels=(f"user:{user['id']}", "main"))
