@@ -1,61 +1,58 @@
-from ormar import Integer, String, Boolean, ForeignKey, Model, ModelMeta, EncryptBackends, Text
+from ormar import Integer, String, Boolean, ForeignKey, Model, ModelMeta
 from conf.sessions import database, metadata
-from conf.jwt import give_secret
+from typing import Optional
 
-class BaseId:
+# *-------------------- Base --------------------* #
+
+class BaseId():
     id: int = Integer(primary_key=True)
 
 class BaseMeta(ModelMeta):
     metadata = metadata
     database = database
 
+# *-------------------- Foreign Key Users --------------------* #
 
-# *Foreign Key Users
 class Otdel(Model, BaseId):
- 
-    name = String(max_length=100)
-
+    name: str = String(max_length=100, unique=True)
     class Meta(BaseMeta):
         ...
 
 class Position(Model, BaseId):
- 
-    name = String(max_length=100)
-
+    name: str = String(max_length=100, unique=True)
     class Meta(BaseMeta):
         ...
 
 class Rank(Model, BaseId):
- 
-    name = String(max_length=100)
-
+    name: str = String(max_length=100, unique=True)
     class Meta(BaseMeta):
         ...
 
-
+# *-------------------- User --------------------* #
 
 class User(Model, BaseId):
  
-    username = String(max_length=100, unique=True)
-    password = String(max_length=200)
+    username: str = String(max_length=100, unique=True)
+    password: str = String(max_length=200)
 
-    first_name = String(max_length=100)
-    last_name = String(max_length=100)
-    middle_name = String(max_length=100, nullable=True)
+    first_name: str = String(max_length=100)
+    last_name: str = String(max_length=100)
+    middle_name: str = String(max_length=100, nullable=True)
 
-    innerphone = String(max_length=50, nullable=True)
-    phone = String(max_length=50, nullable=True)
-    email = String(max_length=150, nullable=True)
+    innerphone: str = String(max_length=50, nullable=True)
+    phone: str = String(max_length=50, nullable=True)
+    email: str = String(max_length=150, nullable=True)
 
-    otdel = ForeignKey(Otdel)
-    position = ForeignKey(Position)
-    rank = ForeignKey(Rank)
+    otdel: Otdel = ForeignKey(Otdel)
+    position: Position = ForeignKey(Position)
+    rank: Rank = ForeignKey(Rank)
 
-    superuser = Boolean(default=False)
+    superuser: bool = Boolean(default=False)
 
     class Meta(BaseMeta):
         ...
 
+    
 
 
 # # *Many-to-many Users

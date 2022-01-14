@@ -4,9 +4,10 @@ from fastapi import (
     Depends,   
 )
 
+
 # from fastapi_jwt_auth import AuthJWT
 # from services.depends import AD
-from orm.schema import UserFull, UserRegister, UserLogin
+from orm.schema import UserRegister
 from services.auth import AuthService
 
 router = APIRouter()
@@ -14,6 +15,9 @@ router = APIRouter()
 # AS = AD(AuthService)
 
 # *Auth
+
+
+
 
 @router.post("/auth/register", status_code=status.HTTP_201_CREATED, tags=['Авторизация'])
 async def get_my_projects(user_data: UserRegister, auth_service: AuthService = Depends(AuthService)):

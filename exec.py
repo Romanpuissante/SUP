@@ -53,14 +53,14 @@ class Exec():
         else:
             n = args[1]
 
-        os.system(f'docker-compose run backend alembic revision --autogenerate -m "{n}"')
+        os.system(f'docker-compose run --rm backend alembic revision --autogenerate -m "{n}"')
 
     @classmethod  
     def migrate(cls, args):
         """
             Record alembic's migrations: docker-compose run backend alembic upgrade head
         """
-        os.system('docker-compose run backend alembic upgrade head')
+        os.system('docker-compose run --rm backend alembic upgrade head')
 
     @classmethod
     def secret(cls, args):

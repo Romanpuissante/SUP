@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.8" 
 
 services:
   db:
@@ -10,6 +10,12 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - ./:/var/lib/postgresql/data
+    # command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    restart: always
 
   redis:
     container_name: redis
@@ -20,6 +26,7 @@ services:
     ports:
       - "6379:6379"
     command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -31,6 +38,7 @@ services:
     depends_on:
       - db
   backend:
+    container_name: backend
     build: ./backend
     command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     environment:

@@ -16,10 +16,9 @@ router = APIRouter(
 # AS = AD(ProjectService)
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def get_my_projects(user_data: UserRegister):
-    o = await AuthService().create(user_data)
-    print(o)
-    return {"mess": o}
+async def get_my_projects():
+    print(User.__fields__)
+    return {"mess": "ok"}
 
 # @router.post('/auth/register', status_code=status.HTTP_201_CREATED, response_model=UserFull, tags=['Авторизация'])
 # async def register(user_data: UserRegister, auth_service: AuthService = Depends(AS.serv)):

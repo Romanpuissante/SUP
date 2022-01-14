@@ -1,2 +1,3 @@
 backend/alembic/versions/*
 redis
+logs/*

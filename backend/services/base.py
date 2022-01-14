@@ -1,0 +1,6 @@
+
+
+
+
+class BaseService():
+    pass

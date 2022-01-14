@@ -3,22 +3,20 @@ from fastapi import (
     status
 )
 
-unauthError = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Некоректные имя пользователя или пароль',
-    headers={'WWW-Authenticate': 'Bearer'},
-)
+class UnauthError(HTTPException):
+    """ Некоректные имя пользователя или пароль """
 
-usernameError = HTTPException(
-    status_code=status.HTTP_409_CONFLICT,
-    detail="Пользователь с таким логином уже существует"
-)
+    def __init__(self) -> None:
+        super().__init__(status.HTTP_401_UNAUTHORIZED, detail='Некоректные имя пользователя или пароль', headers={'WWW-Authenticate': 'Bearer'})
 
-doesNotNoteError = HTTPException(
-    status_code=status.HTTP_409_CONFLICT,
-    detail="Такой записи не существует",
-)
+class UsernameError(HTTPException):
+    """ Пользователь с таким логином уже существует """
 
+    def __init__(self) -> None:
+        super().__init__(status.HTTP_409_CONFLICT, detail='Пользователь с таким логином уже существует')
 
+class DoesNotNoteError(HTTPException):
+    """ Такой записи не существует """
 
-    
+    def __init__(self) -> None:
+        super().__init__(status.HTTP_409_CONFLICT, detail='Такой записи не существует')

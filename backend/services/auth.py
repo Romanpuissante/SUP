@@ -2,21 +2,19 @@
 from passlib.hash import bcrypt
 
 from fastapi_jwt_auth import AuthJWT
-
-# from orm.models import User
-# from orm.schema import UserRegister, UserFull, UserLogin, UserSimple, UserAuth
-# from .base import BaseServices
-# from services.dicts import OtdelService, PositionService, RankService
-from conf.exeptions import unauthError, usernameError
 from asyncpg.exceptions import UniqueViolationError
 
-from orm.schema import UserRegister, UserFull, UserLogin, UserSimple, UserAuth
-from orm.models import User, Otdel, Rank, Position
+from conf.exeptions import UnauthError, UsernameError
+from conf.log import logger
+from orm.models import User, Otdel, Rank, Position, Model
+from orm.schema import UserRegister
+
+
 
 fkAuth: dict = {"otdel": Otdel, "position": Position, "rank": Rank}
 
-class AuthService:
 
+class AuthService:
     
     @classmethod
     def hash_password(cls, password: str) -> str:
@@ -30,13 +28,15 @@ class AuthService:
     def create_access(cls, Authorize: AuthJWT, user: dict) -> str:
         return 'Bearer ' + Authorize.create_access_token(subject=user.username, user_claims= {"user": {k:v for k,v in user.dict().items() if k != 'password'}})
 
-    async def create(self, into_schema: UserRegister) -> UserFull:
+    async def create(self, into_schema: UserRegister) -> User:
+
+        if await User.objects.filter(username=into_schema.username).exists():
+            return UsernameError()
         
         into_schema.password = self.hash_password(into_schema.password)
-        try:
-            return await User.objects.create(**await self.create_fk(into_schema, fkAuth))
-        except UniqueViolationError:
-            return usernameError
+            
+        return await User.objects.create(**(await self.create_fk(into_schema, fkAuth)).dict())
+      
 
     
 
@@ -51,9 +51,11 @@ class AuthService:
         Returns:
             [dict]: Словарь для создания объекта
         """
-        into_schema = into_schema.dict()
+        
         for key, model in dict_fk.items():
-            into_schema[key] = await model.objects.get_or_create(**into_schema[key])
+            res = await model.objects.get_or_create(**(getattr(into_schema,key).dict()))
+            setattr(into_schema, key, res)
+
         return into_schema
 
 
