@@ -2,19 +2,16 @@
 from passlib.hash import bcrypt
 
 from fastapi_jwt_auth import AuthJWT
-from asyncpg.exceptions import UniqueViolationError
 
 from conf.exeptions import UnauthError, UsernameError
 from conf.log import logger
-from orm.models import User, Otdel, Rank, Position, Model
-from orm.schema import UserRegister
+from orm.models import User
+from orm.schema import UserRegister, UserLogin
+from .base import BaseService
 
 
 
-fkAuth: dict = {"otdel": Otdel, "position": Position, "rank": Rank}
-
-
-class AuthService:
+class AuthService(BaseService):
     
     @classmethod
     def hash_password(cls, password: str) -> str:
@@ -25,57 +22,29 @@ class AuthService:
         return bcrypt.verify(plain_password, hashed_password)
 
     @classmethod
-    def create_access(cls, Authorize: AuthJWT, user: dict) -> str:
+    def create_access(cls, Authorize: AuthJWT, user: User) -> str:
         return 'Bearer ' + Authorize.create_access_token(subject=user.username, user_claims= {"user": {k:v for k,v in user.dict().items() if k != 'password'}})
 
-    async def create(self, into_schema: UserRegister) -> User:
+    async def create(self, into_schema: UserRegister) -> dict:
 
         if await User.objects.filter(username=into_schema.username).exists():
             return UsernameError()
         
         into_schema.password = self.hash_password(into_schema.password)
             
-        return await User.objects.create(**(await self.create_fk(into_schema, fkAuth)).dict())
-      
+        await User.objects.create(**await self.create_fk(into_schema.dict(), ("otdel", "rank", "position")))
+        return {"mess": "Пользователь успешно создан"}
 
-    
+    async def auth(self, user_data: UserLogin, Authorize: AuthJWT):
 
-    async def create_fk(self, into_schema, dict_fk: dict) -> dict:
-        """
-        Создает форины
+        user: User = await User.objects.filter(username=user_data.username).get_or_none()
 
-        Args:
-            into_schema ([type]): Ожидаемая схема для создания
-            dict_fk (dict): Словарь по типу {колонка:таблица}
+        if not user or not self.verify_password(user_data.password, user.password):
+            return UnauthError()
 
-        Returns:
-            [dict]: Словарь для создания объекта
-        """
-        
-        for key, model in dict_fk.items():
-            res = await model.objects.get_or_create(**(getattr(into_schema,key).dict()))
-            setattr(into_schema, key, res)
+        access_token = self.create_access(Authorize, user)
+        refresh_token = Authorize.create_refresh_token(subject=user.username)
 
-        return into_schema
+        Authorize.set_refresh_cookies(refresh_token)
 
-
-# class AuthService(BaseServices[UserRegister, UserFull, User]):
-
-
-
-#     async def auth_user(self, user_data: UserLogin, Authorize: AuthJWT): 
-
-#         user: UserAuth = await self.get_with_filter({"username": user_data.username}, UserAuth)
-
-#         if not user:
-#             raise unauthError
-
-#         if not self.verify_password(user_data.password, user.password):
-#             raise unauthError
-
-#         access_token = self.create_access(Authorize, user)
-#         refresh_token = Authorize.create_refresh_token(subject=user.username)
-  
-#         Authorize.set_refresh_cookies(refresh_token)
-
-#         return { "access_token": access_token }
+        return { "access_token": access_token }

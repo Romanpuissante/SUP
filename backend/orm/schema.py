@@ -3,6 +3,8 @@ from .models import User
 # *-------------------- User schema --------------------* #
 
 UserRegister = User.get_pydantic(exclude={"id", "otdel__id", "position__id", "rank__id"})
+UserLogin = User.get_pydantic(include={"username", "password"})
+UserLoad = User.get_pydantic(exclude={"password",})
 
 # *Base
 

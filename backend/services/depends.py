@@ -16,7 +16,8 @@ from conf.log import logger
 
 class AD:
 
-    async def protect(self, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
+    @classmethod
+    async def protect(cls, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
         """
             Требует авторизацию и возвращает текущего пользователя.
             вызов - в аргументы функции передать user_id = Depends(cls.protect)

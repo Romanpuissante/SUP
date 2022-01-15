@@ -1,3 +1,4 @@
 backend/alembic/versions/*
 redis
 logs/*
+pgdata
