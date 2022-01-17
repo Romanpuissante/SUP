@@ -3,6 +3,7 @@ from .models import User
 # *-------------------- User schema --------------------* #
 
 create_user = {"username", "password", "first_name", "last_name", "middle_name", "innerphone", "phone", "email", "otdel__name", "position__name", "rank__name", "superuser"}
+claim_user = create_user.symmetric_difference({"id", "password"})
 
 UserRegister = User.get_pydantic(include=create_user)
 UserLogin = User.get_pydantic(include={"username", "password"})

@@ -6,7 +6,7 @@ from fastapi_jwt_auth import AuthJWT
 from conf.exeptions import UnauthError, UsernameError
 from conf.log import logger
 from orm.models import User
-from orm.schema import UserRegister, UserLogin, create_user
+from orm.schema import UserRegister, UserLogin, claim_user
 from .base import BaseService
 
 
@@ -23,13 +23,12 @@ class AuthService(BaseService):
 
     @classmethod
     def create_access(cls, Authorize: AuthJWT, user: User) -> str:
-        print(user.dict(include=create_user, exclude={"password"}))
-        return 'Bearer ' + Authorize.create_access_token(subject=user.username, user_claims= {"user": user.dict(include=create_user, exclude={"password"})})
+        return 'Bearer ' + Authorize.create_access_token(subject=user.username, user_claims= {"user": user.dict(include=claim_user)})
 
     async def create(self, into_schema: UserRegister) -> dict:
 
         if await User.objects.filter(username=into_schema.username).exists():
-            return UsernameError()
+            raise UsernameError()
         
         into_schema.password = self.hash_password(into_schema.password)
             
@@ -40,8 +39,9 @@ class AuthService(BaseService):
 
         user: User = await User.objects.filter(username=user_data.username).get_or_none()
 
+
         if not user or not self.verify_password(user_data.password, user.password):
-            return UnauthError()
+            raise UnauthError()
 
         access_token = self.create_access(Authorize, user)
         refresh_token = Authorize.create_refresh_token(subject=user.username)
