@@ -1,3 +1,4 @@
+from email.policy import default
 from typing import Optional
 from datetime import date, datetime
 
@@ -58,7 +59,7 @@ class HardSkill(Model, BaseId):
     group: GroupHardSkill = ForeignKey(GroupHardSkill)
     
 
-class UserHardSkills(Model, BaseId):
+class UserHardSkill(Model, BaseId):
     class Meta(BaseMeta):
         ...
     level: Optional[int] = Integer()
@@ -78,7 +79,7 @@ class SoftSkill(Model, BaseId):
     group: GroupSoftSkill = ForeignKey(GroupSoftSkill)
     
 
-class UserSoftSkills(Model, BaseId):
+class UserSoftSkill(Model, BaseId):
     class Meta(BaseMeta):
         ...
     level: Optional[int] = Integer()
@@ -102,8 +103,8 @@ class User(Model, BaseId):
     position: Position = ForeignKey(Position)
     rank: Rank = ForeignKey(Rank)
 
-    hardskills: Optional[list[UserHardSkills]] = ManyToMany(HardSkill,through=UserHardSkills)
-    softskills: Optional[list[UserSoftSkills]] = ManyToMany(SoftSkill,through=UserSoftSkills)
+    hardskills: Optional[list[UserHardSkill]] = ManyToMany(HardSkill,through=UserHardSkill)
+    softskills: Optional[list[UserSoftSkill]] = ManyToMany(SoftSkill,through=UserSoftSkill)
 
     superuser: bool = Boolean(default=False)
 
@@ -124,7 +125,7 @@ class Leave(Model, BaseId):
 # !-------------------- Project --------------------! # 
 # *-------------------- Foreign Key --------------------* #    
 
-class Doctype(Model, BaseId):
+class DocType(Model, BaseId):
     class Meta(BaseMeta):
         ...
     name:str = String(max_length=100,unique=True)
@@ -132,11 +133,11 @@ class Doctype(Model, BaseId):
 
 class ProjectStatus(Model, BaseId):
     class Meta(BaseMeta):
-        ...
+        tablename: str = "projectstatuses"
     name:str = String(max_length=100,unique=True)
 
 
-class ProjectUsers(Model, BaseId):
+class ProjectUser(Model, BaseId):
     class Meta(BaseMeta):
         ...
     involved:Optional[Boolean] = Boolean(default=False)
@@ -154,7 +155,7 @@ class Project(Model, BaseId):
     customer: Optional[str] = String(max_length=250, nullable=True)
     author: User = ForeignKey(User, related_name = "author_user")
     leader: User = ForeignKey(User, related_name = "leader_user")
-    users: Optional[list[ProjectUsers]]= ManyToMany(User, through= ProjectUsers)
+    users: Optional[list[ProjectUser]] = ManyToMany(User, through= ProjectUser)
     datestart: Optional[date] = Date()
     dateend: Optional[date] = Date()
     lastchanged: Optional[date] = Date()
@@ -165,8 +166,8 @@ class Documentation(Model, BaseId):
 
     class Meta(BaseMeta):
         ...
-    pproject: Project = ForeignKey(Project) 
-    doctype: Doctype =  ForeignKey(Doctype)
+    project: Project = ForeignKey(Project) 
+    doctype: DocType =  ForeignKey(DocType)
     created: datetime = DateTime()
     accepted: Optional[datetime]= DateTime()
 
@@ -177,20 +178,29 @@ class HistoryLevel(Model, BaseId):
         ...
     name: str = String(max_length=100,unique=True)
 
-class ProjectHistory(Model, BaseId):
+class HistoryAction(Model, BaseId):
     class Meta(BaseMeta):
         ...
+    name: str = String(max_length=100,unique=True)
+
+class ProjectHistory(Model, BaseId):
+
+    class Meta(BaseMeta):
+        tablename: str = "projecthistories"
+    
+
     text: str = Text()
     level: HistoryLevel = ForeignKey(HistoryLevel)
-    pproject: Project = ForeignKey(Project)
-    ids = Integer()
+    project: Project = ForeignKey(Project)
+    action: HistoryAction = ForeignKey(HistoryAction)    
+    createdate: datetime = DateTime(default=datetime.now())
 
 # !-------------------- Task --------------------! # 
 # *-------------------- Foreign Key --------------------* #
 
 class TaskStatus(Model, BaseId):
     class Meta(BaseMeta):
-        ...
+        tablename: str = "taskstatuses"
     name:str = String(max_length=100,unique=True)
 
 class TaskStage(Model, BaseId):
@@ -203,12 +213,13 @@ class TaskStage(Model, BaseId):
 class Task(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    pproject: Project = ForeignKey(Project)
+    project: Project = ForeignKey(Project)
     name: str = String(max_length=500)
     status: TaskStatus = ForeignKey(TaskStatus)
     description: Optional[Text] = Text()
     datestart: Optional[date] = Date()
     dateend: Optional[date] = Date()
+    dateendchanged: bool = Boolean(default=False)
     responsible: Optional[User] = ForeignKey(User)
     stage: Optional[TaskStage] = ForeignKey(TaskStage)
 
@@ -217,7 +228,7 @@ class Task(Model, BaseId):
 
 class AssignmentStatus(Model, BaseId):
     class Meta(BaseMeta):
-        ...
+        tablename: str = "assignmentstatuses"
     name: str = String(max_length=100,unique=True)
 
 # *-------------------- Base --------------------* #
@@ -225,7 +236,7 @@ class AssignmentStatus(Model, BaseId):
 class Assignment(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    ptask = ForeignKey(Task)
+    task = ForeignKey(Task)
     name: str = String(max_length=255)
     user: Optional[User] = ForeignKey(User)
     status: Optional[AssignmentStatus] = ForeignKey(AssignmentStatus)
@@ -241,14 +252,14 @@ class AssignmentChat(Model, BaseId):
     message: str = Text()
     sender: User = ForeignKey(User)
     datetime: datetime = DateTime()
-    ptaskchlistid: Assignment = ForeignKey(Assignment)
+    assignment: Assignment = ForeignKey(Assignment)
 
 # *-------------------- Files --------------------* #
 
-class AssignmentFiles(Model, BaseId):
+class AssignmentFile(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    ptaskchlistid: Assignment = ForeignKey(Assignment)
+    assignment: Assignment = ForeignKey(Assignment)
     sender: User = ForeignKey(User)
     datetime: datetime = DateTime()
     filepath: str = Text()
@@ -259,7 +270,7 @@ class AssignmentFiles(Model, BaseId):
 
 class Eventstatus(Model, BaseId):
     class Meta(BaseMeta):
-        ...
+        tablename: str = "eventstatuses"
     name: str = String(max_length=100,unique=True)
 
 # *-------------------- Base --------------------* #
@@ -278,7 +289,7 @@ class Event(Model, BaseId):
 class EventCheckList(Model,BaseId):
     class Meta(BaseMeta):
         ...
-    pevent: Event = ForeignKey(Event) 
+    event: Event = ForeignKey(Event) 
     name: str = String(max_length=500)
     user: User = ForeignKey(User)
     checked: bool = Boolean(default = False)
@@ -288,23 +299,32 @@ class EventCheckList(Model,BaseId):
 class EventChat(Model,BaseId):
     class Meta(BaseMeta):
         ...
-    pchlist: EventCheckList = ForeignKey(EventCheckList) 
+    chlist: EventCheckList = ForeignKey(EventCheckList)
     message: str = Text()
     sender: User = ForeignKey(User)
     datetime: datetime = DateTime() 
 
 
-class EventFiles(Model, BaseId):
+class EventFile(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    pchlistchat: EventChat = ForeignKey(EventChat)
+    chlist: EventCheckList = ForeignKey(EventCheckList)
     sender: User = ForeignKey(User)
     datetime: datetime = DateTime()
     filepath: str = Text()
 
+class EventHistory(Model, BaseId):
+    class Meta(BaseMeta):
+        tablename: str = "eventhistories"
+    text: str = Text()
+    level: HistoryLevel = ForeignKey(HistoryLevel)
+    event: Event = ForeignKey(Event)
+    action: HistoryAction = ForeignKey(HistoryAction)    
+    createdate: datetime = DateTime(default=datetime.now())
+
 # !-------------------- Notes --------------------! #
 
-class Notes(Model, BaseId):
+class Note(Model, BaseId):
     class Meta(BaseMeta):
         ...
     message: Optional[str] = Text()
@@ -313,40 +333,34 @@ class Notes(Model, BaseId):
     note:bool = Boolean() 
     visiblefor: Optional[list[User]] = ManyToMany(User, related_name = "visiblefor_x_user") 
 
-class NotesCheckList(Model, BaseId):
+class NoteCheckList(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    pnote: Notes = ForeignKey(Notes)
+    note: Note = ForeignKey(Note)
     name:str = String(max_length=300)
     checked:bool = Boolean(default=False) 
 
-class NoteFiles(Model, BaseId):
+class NoteFile(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    pnote:Notes =  ForeignKey(Notes)
-    filepath:str = String(max_length=1000)
+    note: Note =  ForeignKey(Note)
+    filepath: str = String(max_length=1000)
     sender: User = ForeignKey(User)
     datetime: datetime = DateTime()
 
 # !-------------------- Canban --------------------! #
 
-class CanbanTask(Model, BaseId):
-    class Meta(BaseMeta):
-        ...
-    stage:str = String(max_length=100, default='Не распределено')
-
-class CanbanNotes(Model, BaseId):
-    class Meta(BaseMeta):
-        ...
-    stage:str = String(max_length=100, default='Не распределено')      
-
-
 class Canban(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    name:str = String(max_length=100)
-    author:User=ForeignKey(User,related_name="author_canban")
-    name:str = String(max_length=100)    
-    user:User = ManyToMany(User, related_name="canbanuser_x_user")
-    task: Optional[list[CanbanTask]]= ManyToMany(Task, through= CanbanTask)
-    note:Optional[list[Notes]]= ManyToMany(Notes, through= CanbanTask)
+    name: str = String(max_length=100)
+    author: User=ForeignKey(User,related_name="author_canban") 
+    users: User = ManyToMany(User, related_name="canbanuser_x_user")
+    
+class CanbanStage(Model, BaseId):
+    class Meta(BaseMeta):
+        ...
+    canban: Canban = ForeignKey(Canban)
+    name:str = String(max_length=100, default='Не распределено')
+    tasks: Optional[list[Task]]= ManyToMany(Task)
+    notes: Optional[list[Note]]= ManyToMany(Note)

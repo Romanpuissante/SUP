@@ -2,9 +2,13 @@ from .models import User
 
 # *-------------------- User schema --------------------* #
 
-UserRegister = User.get_pydantic(exclude={"id", "otdel__id", "position__id", "rank__id"})
+create_user = {"username", "password", "first_name", "last_name", "middle_name", "innerphone", "phone", "email", "otdel__name", "position__name", "rank__name", "superuser"}
+
+UserRegister = User.get_pydantic(include=create_user)
 UserLogin = User.get_pydantic(include={"username", "password"})
 UserLoad = User.get_pydantic(exclude={"password",})
+
+
 
 # *Base
 
