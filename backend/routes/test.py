@@ -4,7 +4,7 @@ from fastapi import (
     status
 )
 
-from orm.models import Otdel, User
+from orm.models import *
 from services.auth import AuthService
 from orm.schema import UserRegister
 
@@ -17,7 +17,7 @@ router = APIRouter(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def get_my_projects():
-    print(User.__fields__)
+    print(User.id)
     return {"mess": "ok"}
 
 # @router.post('/auth/register', status_code=status.HTTP_201_CREATED, response_model=UserFull, tags=['Авторизация'])

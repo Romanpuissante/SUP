@@ -47,7 +47,7 @@ async def websocketwork(idp:int ,websocket: WebSocket, user=Depends(AD.protect_w
 
         print(message)
 
-        users = [{"id": 1}, {"id": 2}, {"id": 3}]
+        users = [{"id": 1}, {"id": 3}, {"id": 2}]
 
         answer = {
             f"user:{user['id']}": message,
