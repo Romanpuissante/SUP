@@ -3,7 +3,7 @@ from fastapi import (
     Depends,
     status
 )
-
+from services.depends import AD
 from orm.models import *
 from services.auth import AuthService
 from orm.schema import UserRegister
@@ -16,9 +16,10 @@ router = APIRouter(
 # AS = AD(ProjectService)
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def get_my_projects():
-    print(User.id)
-    return {"mess": "ok"}
+async def get_my_projects(user=Depends(AD.protect)):
+    print(user)
+    pr = await Project.objects.filter((Project.author==user)|(Project.leader==user)|(Project.author==user)).get()
+    return {"mess": pr}
 
 # @router.post('/auth/register', status_code=status.HTTP_201_CREATED, response_model=UserFull, tags=['Авторизация'])
 # async def register(user_data: UserRegister, auth_service: AuthService = Depends(AS.serv)):

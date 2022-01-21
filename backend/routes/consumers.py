@@ -57,7 +57,6 @@ async def websocketwork(idp:int ,websocket: WebSocket, user=Depends(AD.protect_w
 
         for user1 in users:
             answer[f"user:{user1['id']}"] = message
-
         return answer
         
     await RedisWorker.create_channels(websocket, consumer, channels=(f"user:{user['id']}", f"project:{idp}", "main"))
