@@ -1,4 +1,4 @@
-from .models import User
+from .models import User, Project
 
 # *-------------------- User schema --------------------* #
 
@@ -8,6 +8,20 @@ claim_user = create_user.symmetric_difference({"id", "password"})
 UserRegister = User.get_pydantic(include=create_user)
 UserLogin = User.get_pydantic(include={"username", "password"})
 UserLoad = User.get_pydantic(exclude={"password",})
+
+
+ProjectCreate = Project.get_pydantic(include={"name", "description", "status", "customer", "author__id", "leader__id", "users__id", "lastchanged"})
+
+# name: str = String(max_length=500)
+#     description: Optional[str] = Text()
+#     status: Optional[ProjectStatus] = ForeignKey(ProjectStatus)
+#     customer: Optional[str] = String(max_length=250, nullable=True)
+#     author: User = ForeignKey(User, related_name = "author_user")
+#     leader: User = ForeignKey(User, related_name = "leader_user")
+#     users: Optional[list[ProjectUser]] = ManyToMany(User, through= ProjectUser)
+#     datestart: Optional[date] = Date()
+#     dateend: Optional[date] = Date()
+#     lastchanged: Optional[date] = Date()
 
 
 

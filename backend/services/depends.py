@@ -29,6 +29,18 @@ class AD:
         return current_user
 
     @classmethod
+    async def protect_claim(cls, Authorize: AuthJWT = Depends(), apikey = Depends(APIAuth().set)):
+        """
+            Требует авторизацию и возвращает текущего пользователя со всеми полями.
+            вызов - в аргументы функции передать user_id = Depends(cls.protect_claim)
+        """
+
+        Authorize.jwt_required()
+        current_user = Authorize.get_raw_jwt()['user']
+
+        return current_user
+
+    @classmethod
     async def protect_ws(cls, websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):
 
         await websocket.accept()

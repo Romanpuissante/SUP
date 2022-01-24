@@ -9,12 +9,13 @@ from fastapi import (
 
 from conf.sessions import get_redis_pool
 from conf.log import logger
+import json
 
 class RedisWorker:
     """ Обработчик редис запросов """
 
     @classmethod
-    async def create_channels(cls, ws: WebSocket, consumer: FunctionType, channels=("main",)):
+    async def create_channels(cls, ws: WebSocket, consumer: FunctionType = None, channels=("main",), save_info: dict=None):
 
         """ Создает каналы, для ассинхронной отправки сообщений
 
@@ -31,9 +32,12 @@ class RedisWorker:
         """
 
         conn: Redis = await get_redis_pool()
+        if save_info:
+            for channel, info in save_info.items():
+                await conn.set(channel, json.dumps(info))
         pubsub = conn.pubsub()
 
-        async def consumer_handler(conn: Redis, ws: WebSocket, channels: tuple):
+        async def consumer_handler(conn: Redis, ws: WebSocket, channels: tuple, save_info: dict):
             """ Публикует каналы в редис
 
             Args:
@@ -45,12 +49,16 @@ class RedisWorker:
                 while True:
                     message = await ws.receive_text()
                     if message:
-                        result: dict = await consumer(message)
+                        if consumer:
+                            result: dict = await consumer(message, conn)
                         for (channel, answer) in result.items():
                             await conn.publish(channel, answer)
 
             except WebSocketDisconnect:
 
+                if save_info:
+                    for channel in save_info.keys():
+                        await conn.delete(channel)
                 await conn.publish(channels[0], "StopSocket")
                 await conn.close()
                 return
@@ -87,7 +95,7 @@ class RedisWorker:
                 logger.exception(e)
 
 
-        consumer_task = consumer_handler(conn=conn, ws=ws, channels=channels)
+        consumer_task = consumer_handler(conn=conn, ws=ws, channels=channels, save_info=save_info)
         producer_task = producer_handler(pubsub=pubsub, ws=ws, channels=channels)
         
         done, pending = await asyncio.wait(
