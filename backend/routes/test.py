@@ -15,14 +15,28 @@ router = APIRouter(
 )
 # AS = AD(ProjectService)
 
-@router.post("/", response_model=ProjectCreate, status_code=status.HTTP_201_CREATED)
+@router.post("/",  status_code=status.HTTP_201_CREATED)
+#  ! 
 async def get_my_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
-
+    print(project.dict())
+    print("---------------------------")
+    proj=project.dict()
+    # ! PK ONLY
     # u = User(id = user["id"], __pk_only__ = True)
+    # ! И
     # (Project.author==User(id = user["id"]))|(Project.leader==user["id"])|(Project.author==user["id"])
+    # ! VALUES
     # pr = await Project.objects.filter(author=u.pk).values()
-    pr = await Project.objects.create(**project.dict())
-    return {"mess": "ok"}
+    # ! MANY 2 MANY SAVE
+    # pr = await Project.objects.create(**proj)
+    # for x in proj["users"]:    
+    #     await pr.users.add(User(id = x["id"], __pk_only__ = True))
+    # return {"mess": "ok"}
+
+
+
+# post = await Post(title="Test post").save() 
+# await post.categories.create( name="Test category1",  postcategory={"sort_order": 1, "param_name": "volume"}, )
 
 # @router.post('/auth/register', status_code=status.HTTP_201_CREATED, response_model=UserFull, tags=['Авторизация'])
 # async def register(user_data: UserRegister, auth_service: AuthService = Depends(AS.serv)):

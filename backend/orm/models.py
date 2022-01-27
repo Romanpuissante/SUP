@@ -62,7 +62,7 @@ class HardSkill(Model, BaseId):
 class UserHardSkill(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    level: Optional[int] = Integer()
+    level: Optional[int] = Integer(nullable=True)
 
 
 
@@ -82,7 +82,7 @@ class SoftSkill(Model, BaseId):
 class UserSoftSkill(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    level: Optional[int] = Integer()
+    level: Optional[int] = Integer(nullable=True)
 
 # *-------------------- Base --------------------* #
 
@@ -149,16 +149,16 @@ class Project(Model, BaseId):
     class Meta(BaseMeta):
         ...
 
-    name: str = String(max_length=500)
-    description: Optional[str] = Text()
-    status: Optional[ProjectStatus] = ForeignKey(ProjectStatus)
+    name: str = String(max_length=255)
+    description: Optional[str] = Text(nullable=True)
+    status: Optional[ProjectStatus] = ForeignKey(ProjectStatus,nullable=True)
     customer: Optional[str] = String(max_length=250, nullable=True)
     author: User = ForeignKey(User, related_name = "author_user")
     leader: User = ForeignKey(User, related_name = "leader_user")
     users: Optional[list[ProjectUser]] = ManyToMany(User, through= ProjectUser)
-    datestart: Optional[date] = Date()
-    dateend: Optional[date] = Date()
-    lastchanged: Optional[date] = Date()
+    datestart: Optional[date] = Date(nullable=True)
+    dateend: Optional[date] = Date(nullable=True)
+    lastchanged: Optional[date] = DateTime(nullable=True)
 
 # *-------------------- Documentation --------------------* #
 
@@ -216,12 +216,12 @@ class Task(Model, BaseId):
     project: Project = ForeignKey(Project)
     name: str = String(max_length=500)
     status: TaskStatus = ForeignKey(TaskStatus)
-    description: Optional[Text] = Text()
-    datestart: Optional[date] = Date()
-    dateend: Optional[date] = Date()
+    description: Optional[Text] = Text(nullable=True)
+    datestart: Optional[date] = Date(nullable=True)
+    dateend: Optional[date] = Date(nullable=True)
     dateendchanged: bool = Boolean(default=False)
-    responsible: Optional[User] = ForeignKey(User)
-    stage: Optional[TaskStage] = ForeignKey(TaskStage)
+    responsible: Optional[User] = ForeignKey(User, nullable=True)
+    stage: Optional[TaskStage] = ForeignKey(TaskStage, nullable=True)
 
 # !-------------------- Assignment --------------------! #
 # *-------------------- Foreign Key --------------------* #
@@ -240,8 +240,8 @@ class Assignment(Model, BaseId):
     name: str = String(max_length=255)
     user: Optional[User] = ForeignKey(User)
     status: Optional[AssignmentStatus] = ForeignKey(AssignmentStatus)
-    datetimestart: Optional[datetime] = DateTime()
-    datetimeend: Optional[datetime] = DateTime()
+    datetimestart: Optional[datetime] = DateTime(nullable=True)
+    datetimeend: Optional[datetime] = DateTime(nullable=True)
     timeneeded: Optional[int] = Integer(default=0)
 
 # *-------------------- Chat --------------------* #
@@ -362,5 +362,5 @@ class CanbanStage(Model, BaseId):
         ...
     canban: Canban = ForeignKey(Canban)
     name:str = String(max_length=100, default='Не распределено')
-    tasks: Optional[list[Task]]= ManyToMany(Task)
-    notes: Optional[list[Note]]= ManyToMany(Note)
+    tasks: Optional[list[Task]]= ManyToMany(Task,nullable=True)
+    notes: Optional[list[Note]]= ManyToMany(Note,nullable=True)
