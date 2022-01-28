@@ -10,7 +10,7 @@ UserLogin = User.get_pydantic(include={"username", "password"})
 UserLoad = User.get_pydantic(exclude={"password",})
 
 
-ProjectCreate = Project.get_pydantic(include={"name", "description", "status__id", "customer", "author__id", "leader__id", "users__id", "lastchanged"})
+ProjectCreate = Project.get_pydantic(include={"id","name", "description", "status__id", "customer", "author__id", "leader__id", "users__id", "lastchanged"})
 
 # name: str = String(max_length=500)
 #     description: Optional[str] = Text()

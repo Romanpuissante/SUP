@@ -1,4 +1,5 @@
 from email.policy import default
+from sqlite3 import Timestamp
 from typing import Optional
 from datetime import date, datetime
 
@@ -158,7 +159,7 @@ class Project(Model, BaseId):
     users: Optional[list[ProjectUser]] = ManyToMany(User, through= ProjectUser)
     datestart: Optional[date] = Date(nullable=True)
     dateend: Optional[date] = Date(nullable=True)
-    lastchanged: Optional[date] = DateTime(nullable=True)
+    lastchanged: Optional[datetime] = DateTime(nullable=True)
 
 # *-------------------- Documentation --------------------* #
 

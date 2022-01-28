@@ -17,10 +17,10 @@ router = APIRouter(
 
 @router.post("/",  status_code=status.HTTP_201_CREATED)
 #  ! 
-async def get_my_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
-    print(project.dict())
-    print("---------------------------")
-    proj=project.dict()
+async def create_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
+   
+    print("-----!---------!------------!-")
+    print(user)
     # ! PK ONLY
     # u = User(id = user["id"], __pk_only__ = True)
     # ! И
@@ -28,11 +28,27 @@ async def get_my_projects(project: ProjectCreate, user=Depends(AD.protect_claim)
     # ! VALUES
     # pr = await Project.objects.filter(author=u.pk).values()
     # ! MANY 2 MANY SAVE
-    # pr = await Project.objects.create(**proj)
-    # for x in proj["users"]:    
-    #     await pr.users.add(User(id = x["id"], __pk_only__ = True))
-    # return {"mess": "ok"}
+    pr = await Project.objects.create( **project.dict(exclude={'users','id'}))
+    for user in project.users:    
+        await pr.users.add(User(id = user.id, __pk_only__ = True))
+    return {"mess": "ok"}
 
+@router.post("/updateproj",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def get_my_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
+#    В апдейте надо придумать,чтобы при добавлении юзера или удалении его из проекта, 
+#  происходила отправка только тем, кому надо.
+    print("-----!---------!------------!-")
+    
+    
+    pr = await Project.objects.select_related("users").get(id=project.id)
+    print(pr)
+    # await pr.users.clear()
+    await pr.update( **project.dict(exclude={'users'}))
+    
+    for user in project.users:    
+        await pr.users.add(User(id = user.id, __pk_only__ = True))
+    return {"mess": "ok"}
 
 
 # post = await Post(title="Test post").save() 
