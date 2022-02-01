@@ -6,7 +6,8 @@ from fastapi import (
 from services.depends import AD
 from orm.models import *
 from services.auth import AuthService
-from orm.schema import UserRegister, ProjectCreate
+from orm.schema import UserRegister, ProjectCreate, ProjectUpdate
+from conf.log import logger
 
 router = APIRouter(
     prefix='/test',
@@ -17,10 +18,10 @@ router = APIRouter(
 
 @router.post("/",  status_code=status.HTTP_201_CREATED)
 #  ! 
-async def create_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
+async def create_projects(project: ProjectCreate):
    
     print("-----!---------!------------!-")
-    print(user)
+
     # ! PK ONLY
     # u = User(id = user["id"], __pk_only__ = True)
     # ! И
@@ -28,27 +29,41 @@ async def create_projects(project: ProjectCreate, user=Depends(AD.protect_claim)
     # ! VALUES
     # pr = await Project.objects.filter(author=u.pk).values()
     # ! MANY 2 MANY SAVE
-    pr = await Project.objects.create( **project.dict(exclude={'users','id'}))
-    for user in project.users:    
+    newpr =project.dict(exclude={'users','id'})
+    newpr["lastchanged"] = datetime.now()
+    pr = await Project.objects.create(**newpr)
+    for user in project.users:  
         await pr.users.add(User(id = user.id, __pk_only__ = True))
     return {"mess": "ok"}
 
+# , user=Depends(AD.protect_claim)
 @router.post("/updateproj",  status_code=status.HTTP_201_CREATED)
 #  ! 
-async def get_my_projects(project: ProjectCreate, user=Depends(AD.protect_claim)):
-#    В апдейте надо придумать,чтобы при добавлении юзера или удалении его из проекта, 
-#  происходила отправка только тем, кому надо.
-    print("-----!---------!------------!-")
+async def upd_my_projects(project: ProjectUpdate):
+
+    project_field_update = project.dict(exclude={'users'}, exclude_unset=True)
+    if len(project_field_update.keys()) > 1:
+        project_field_update["lastchanged"] = datetime.now()
+        await Project(**project_field_update).update(project_field_update.keys())
+
+    if "users" not in project.dict(exclude_unset=True):
+        return {"mess": "Нет юзеров"}
     
-    
-    pr = await Project.objects.select_related("users").get(id=project.id)
-    print(pr)
-    # await pr.users.clear()
-    await pr.update( **project.dict(exclude={'users'}))
-    
-    for user in project.users:    
-        await pr.users.add(User(id = user.id, __pk_only__ = True))
-    return {"mess": "ok"}
+    project_with_users = await Project.objects.select_related("users").fields(['id', 'users__id']).get(id=project.id)
+    projectuser = project_with_users.users
+
+    oldusers = {user.id for user in projectuser}
+    currentusers = {user.id for user in project.users}
+
+    for userid in oldusers.difference(currentusers):
+        await projectuser.remove(User(id = userid, __pk_only__ = True))
+        # "Вас исключили из проекта"
+
+    for userid in currentusers.difference(oldusers):
+        await projectuser.add(User(id = userid, __pk_only__ = True))
+        # Вы добавлены в проект
+
+    return {"mess": projectuser}
 
 
 # post = await Post(title="Test post").save() 

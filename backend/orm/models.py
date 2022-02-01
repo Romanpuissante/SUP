@@ -1,11 +1,8 @@
-from email.policy import default
-from sqlite3 import Timestamp
 from typing import Optional
 from datetime import date, datetime
 
-from ormar import Integer, String, Boolean, ForeignKey, Model, ModelMeta, ManyToMany, Date, Text, DateTime
+from ormar import Integer, String, Boolean, ForeignKey, Model, ModelMeta, ManyToMany, Date, Text, DateTime, pre_save, pre_update
 from conf.sessions import database, metadata
-
 
 # *-------------------- Base --------------------* #
 
@@ -89,11 +86,11 @@ class UserSoftSkill(Model, BaseId):
 
 class User(Model, BaseId):
  
-    username: str = String(max_length=100, unique=True)
-    password: str = String(max_length=200)
+    username: str = String(max_length=100, unique=True, sql_nullable=False, nullable=True)
+    password: str = String(max_length=200, sql_nullable=False, nullable=True)
 
-    first_name: str = String(max_length=100)
-    last_name: str = String(max_length=100)
+    first_name: str = String(max_length=100, sql_nullable=False, nullable=True)
+    last_name: str = String(max_length=100, sql_nullable=False, nullable=True)
     middle_name: Optional[str] = String(max_length=100, nullable=True)
 
     innerphone: Optional[str] = String(max_length=50, nullable=True)
@@ -150,7 +147,7 @@ class Project(Model, BaseId):
     class Meta(BaseMeta):
         ...
 
-    name: str = String(max_length=255)
+    name: str = String(max_length=255, sql_nullable=False, nullable=True)
     description: Optional[str] = Text(nullable=True)
     status: Optional[ProjectStatus] = ForeignKey(ProjectStatus,nullable=True)
     customer: Optional[str] = String(max_length=250, nullable=True)
@@ -160,6 +157,19 @@ class Project(Model, BaseId):
     datestart: Optional[date] = Date(nullable=True)
     dateend: Optional[date] = Date(nullable=True)
     lastchanged: Optional[datetime] = DateTime(nullable=True)
+
+
+# def change_lastchanged(instance):
+#     setattr(instance, "lastchanged", datetime.now())
+
+# @pre_update(Project)
+# async def before_update(sender, instance, **kwargs):
+#     change_lastchanged(instance)
+
+# @pre_save(Project)
+# async def before_update(sender, instance, **kwargs):
+#     change_lastchanged(instance)
+
 
 # *-------------------- Documentation --------------------* #
 

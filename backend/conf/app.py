@@ -8,7 +8,9 @@ from conf.sessions import database, metadata
 
 from .jwt import give_secret
 
-
+import os, time
+os.environ['TZ'] = 'Europe/Moscow'
+time.tzset()
 
 app = FastAPI(title="Async SUP", version="alfa 1.0.0", description="Схема")
 app.state.database = database
