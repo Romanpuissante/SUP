@@ -1,6 +1,6 @@
 from datetime import datetime
 from lib2to3.pytree import Base
-from .models import User, Project, ProjectStatus, ProjectUser
+from .models import *
 from pydantic import BaseModel
 from typing import Optional
 
@@ -16,10 +16,12 @@ UserLoad = User.get_pydantic(exclude={"password",})
 
 # ProjectCreate = Project.get_pydantic(include={"id","name", "description", "status__id", "customer", "author__id", "leader__id", "users__id", "lastchanged"})
 
-
-class ProjectCreate(BaseModel):
+class BaseCreateProjectTask(BaseModel):
     name: Optional[str]
     description: Optional[str]
+
+
+class ProjectCreate(BaseCreateProjectTask):    
     status: Optional[ProjectStatus.get_pydantic(include={"id"})]
     customer: Optional[str]
     author: Optional[User.get_pydantic(include={"id"})]
@@ -29,6 +31,29 @@ class ProjectCreate(BaseModel):
 
 class ProjectUpdate(ProjectCreate):
     id: int
+
+class TaskCreate(BaseCreateProjectTask):
+    project: Optional[Project.get_pydantic(include={"id"})]
+    status: Optional[TaskStatus.get_pydantic(include={"id"})]
+    datestart:Optional[date]
+    dateend: Optional[date]
+    responsible: Optional[User.get_pydantic(include={"id"})]
+    users: Optional[list[ProjectUser.get_pydantic(include={"id"})]]
+
+class TaskUpdate(TaskCreate):
+    id:int
+
+
+class AssigmentCreate(BaseModel):
+    task: Optional[Task.get_pydantic(include={"id"})]
+    name: str
+    user: Optional[User.get_pydantic(include={"id"})]
+    status: Optional[AssignmentStatus.get_pydantic(include={"id"})]
+    datetimeend:Optional[datetime] 
+    
+
+
+
 
 
 # *Base

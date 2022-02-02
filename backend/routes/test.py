@@ -3,10 +3,11 @@ from fastapi import (
     Depends,
     status
 )
+from ormar import or_
 from services.depends import AD
 from orm.models import *
 from services.auth import AuthService
-from orm.schema import UserRegister, ProjectCreate, ProjectUpdate
+from orm.schema import *
 from conf.log import logger
 
 router = APIRouter(
@@ -14,9 +15,53 @@ router = APIRouter(
     tags=['Всяческое тестирование'], 
     
 )
-# AS = AD(ProjectService)
 
-@router.post("/",  status_code=status.HTTP_201_CREATED)
+
+# async def geto_user(id: int, use
+# AS = AD(ProjectService)
+@router.post("/createassigment",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def createassigment(assigment: AssigmentCreate):
+    pr = await Assignment.objects.create(**assigment.dict())
+    return {"mess": "ok"}
+
+
+
+
+
+@router.get("/{userid}/{projectid}/{taskid}",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def get_task_list(userid: int, projectid:int,taskid:int):
+    ...
+
+
+
+
+
+
+@router.get("/{userid}",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def get_project_list(userid: int):
+#    ! Нужно создать задачу, только потом получится )
+
+    prlist = await Project.objects.select_related(["users","tasks"]).filter(or_(users__id=userid, author = userid, leader=userid)).fields(['id', 'name','lastchanged', 'status','author','users__id','dateend','tasks__id','tasks__name','tasks__status']).all()
+    for x in prlist:        
+        setattr(x, "taskall", await x.tasks.count())
+        setattr(x, "taskchecked", await x.tasks.filter(status=4).count())
+    print("-----!---------!------------!-")    
+    return {"mess": prlist}
+
+
+
+@router.post("/deleteproj",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def del_project(projectid: int):
+    await Project.objects.delete(id = projectid)
+   
+    print("-----!---------!------------!-")
+    return {"mess": "Проект удален"}
+
+@router.post("/createproj",  status_code=status.HTTP_201_CREATED)
 #  ! 
 async def create_projects(project: ProjectCreate):
    
@@ -50,8 +95,8 @@ async def upd_my_projects(project: ProjectUpdate):
         return {"mess": "Нет юзеров"}
     
     project_with_users = await Project.objects.select_related("users").fields(['id', 'users__id']).get(id=project.id)
+    
     projectuser = project_with_users.users
-
     oldusers = {user.id for user in projectuser}
     currentusers = {user.id for user in project.users}
 
@@ -64,6 +109,21 @@ async def upd_my_projects(project: ProjectUpdate):
         # Вы добавлены в проект
 
     return {"mess": projectuser}
+
+
+
+
+@router.post("/createtask",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def create_task(task: TaskCreate):
+    newtask =task.dict(exclude={'users','id'})    
+    ts = await Task.objects.create(**newtask)
+    for user in task.users:  
+        await ts.users.add(User(id = user.id, __pk_only__ = True))
+    
+    return {"mess": "ok"}
+    
+
 
 
 # post = await Post(title="Test post").save() 

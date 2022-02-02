@@ -5,6 +5,17 @@ from ormar import Integer, String, Boolean, ForeignKey, Model, ModelMeta, ManyTo
 from conf.sessions import database, metadata
 
 # *-------------------- Base --------------------* #
+async def change_lastchanged(sender,instance):  
+    ttoup=await Project.objects.get(id=instance.project.id)
+    
+    upit = {'lastchanged':datetime.now()}
+    
+    if instance.datestart and (not ttoup.datestart or instance.datestart < ttoup.datestart):
+        upit['datestart'] = instance.datestart
+    if instance.dateend and (not ttoup.dateend or instance.dateend < ttoup.dateend):
+        upit['dateend'] = instance.dateend
+    await ttoup.update(**upit)
+
 
 class BaseId():
     """
@@ -157,10 +168,10 @@ class Project(Model, BaseId):
     datestart: Optional[date] = Date(nullable=True)
     dateend: Optional[date] = Date(nullable=True)
     lastchanged: Optional[datetime] = DateTime(nullable=True)
+    taskall:Optional[int]
+    taskchecked:Optional[int]
 
-
-# def change_lastchanged(instance):
-#     setattr(instance, "lastchanged", datetime.now())
+# 
 
 # @pre_update(Project)
 # async def before_update(sender, instance, **kwargs):
@@ -220,19 +231,30 @@ class TaskStage(Model, BaseId):
     name:str = String(max_length=500,unique=True)
 
 # *-------------------- Base --------------------* #
+class TaskUser(Model, BaseId):
+    class Meta(BaseMeta):
+        ...
 
 class Task(Model, BaseId):
     class Meta(BaseMeta):
         ...
     project: Project = ForeignKey(Project)
-    name: str = String(max_length=500)
+    name: Optional[str] = String(max_length=500, sql_nullable=False, nullable=False)
     status: TaskStatus = ForeignKey(TaskStatus)
     description: Optional[Text] = Text(nullable=True)
     datestart: Optional[date] = Date(nullable=True)
     dateend: Optional[date] = Date(nullable=True)
     dateendchanged: bool = Boolean(default=False)
-    responsible: Optional[User] = ForeignKey(User, nullable=True)
+    responsible: Optional[User] = ForeignKey(User, nullable=True, related_name = "responsible_user")
     stage: Optional[TaskStage] = ForeignKey(TaskStage, nullable=True)
+    users: Optional[list[TaskUser]] = ManyToMany(User, through= TaskUser)
+
+@pre_save(Task)
+async def before_update(sender, instance, **kwargs):
+    await change_lastchanged(sender,instance)
+@pre_update(Task)
+async def before_update(sender, instance, **kwargs):
+    await change_lastchanged(sender, instance)
 
 # !-------------------- Assignment --------------------! #
 # *-------------------- Foreign Key --------------------* #
