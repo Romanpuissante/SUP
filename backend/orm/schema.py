@@ -13,6 +13,15 @@ claim_user = create_user.symmetric_difference({"id", "password"})
 UserRegister = User.get_pydantic(include=create_user)
 UserLogin = User.get_pydantic(include={"username", "password"})
 UserLoad = User.get_pydantic(exclude={"password",})
+# UserList = User.get_pydantic(include={"id", "first_name","middle_name","last_name","otdel__name"})
+
+class UserList(BaseModel):
+    id: int
+    first_name: str
+    middle_name: str
+    last_name: str
+    otdel: Otdel
+
 
 # ProjectCreate = Project.get_pydantic(include={"id","name", "description", "status__id", "customer", "author__id", "leader__id", "users__id", "lastchanged"})
 

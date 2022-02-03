@@ -27,6 +27,14 @@ async def updateassigment(assigment: AssigmentUpdate):
     return {"mess": "ok"}
 
 
+@router.get("/getuser")
+#  ! 
+async def users():
+    users = await User.objects.values({"id", "first_name"})
+    
+    print(users)
+    
+    return {"mess": users}
 
 
 @router.post("/createassigment",  status_code=status.HTTP_201_CREATED)
