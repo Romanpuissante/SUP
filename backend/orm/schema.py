@@ -49,8 +49,12 @@ class AssigmentCreate(BaseModel):
     name: str
     user: Optional[User.get_pydantic(include={"id"})]
     status: Optional[AssignmentStatus.get_pydantic(include={"id"})]
-    datetimeend:Optional[datetime] 
-    
+    datetimeend:Optional[datetime] = datetime.now()
+
+class AssigmentUpdate(AssigmentCreate):
+    id:int
+    datetimestart: Optional[datetime] = datetime.now()
+    timeneeded: Optional[int]
 
 
 

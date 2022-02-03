@@ -168,8 +168,7 @@ class Project(Model, BaseId):
     datestart: Optional[date] = Date(nullable=True)
     dateend: Optional[date] = Date(nullable=True)
     lastchanged: Optional[datetime] = DateTime(nullable=True)
-    taskall:Optional[int]
-    taskchecked:Optional[int]
+ 
 
 # 
 
@@ -238,7 +237,7 @@ class TaskUser(Model, BaseId):
 class Task(Model, BaseId):
     class Meta(BaseMeta):
         ...
-    project: Project = ForeignKey(Project)
+    project: Project = ForeignKey(Project, related_name = "project_task")
     name: Optional[str] = String(max_length=500, sql_nullable=False, nullable=False)
     status: TaskStatus = ForeignKey(TaskStatus)
     description: Optional[Text] = Text(nullable=True)

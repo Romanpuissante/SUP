@@ -6,6 +6,8 @@
 # TRUNCATE TABLE public.taskstatuses CASCADE;
 # INSERT INTO public.taskstatuses (name) VALUES ('Черновик'),('В работе'),('Приостановлена'),('Завершена')
 
+# TRUNCATE TABLE public.assignmentstatuses CASCADE;
+# INSERT INTO public.assignmentstatuses (name) VALUES ('Черновик'),('Назначено'),('В работе'),('Приостановлено'),('Завершено')
 
 # ! Тестовый проект
 

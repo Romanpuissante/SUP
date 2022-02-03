@@ -3,12 +3,13 @@ from fastapi import (
     Depends,
     status
 )
-from ormar import or_
+from sqlalchemy import select, func, or_
+from conf.sessions import database
 from services.depends import AD
 from orm.models import *
-from services.auth import AuthService
 from orm.schema import *
 from conf.log import logger
+from services.projects import ProjectService
 
 router = APIRouter(
     prefix='/test',
@@ -19,6 +20,15 @@ router = APIRouter(
 
 # async def geto_user(id: int, use
 # AS = AD(ProjectService)
+@router.post("/updateassigment",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def updateassigment(assigment: AssigmentUpdate):
+    print(assigment)
+    return {"mess": "ok"}
+
+
+
+
 @router.post("/createassigment",  status_code=status.HTTP_201_CREATED)
 #  ! 
 async def createassigment(assigment: AssigmentCreate):
@@ -31,8 +41,10 @@ async def createassigment(assigment: AssigmentCreate):
 
 @router.get("/{userid}/{projectid}/{taskid}",  status_code=status.HTTP_201_CREATED)
 #  ! 
-async def get_task_list(userid: int, projectid:int,taskid:int):
-    ...
+async def get_task_list(userid: int, projectid:int):
+    
+    result = await ProjectService.give_list_tasks(userid, projectid)
+    return {"mess": result}
 
 
 
@@ -43,13 +55,9 @@ async def get_task_list(userid: int, projectid:int,taskid:int):
 #  ! 
 async def get_project_list(userid: int):
 #    ! Нужно создать задачу, только потом получится )
-
-    prlist = await Project.objects.select_related(["users","tasks"]).filter(or_(users__id=userid, author = userid, leader=userid)).fields(['id', 'name','lastchanged', 'status','author','users__id','dateend','tasks__id','tasks__name','tasks__status']).all()
-    for x in prlist:        
-        setattr(x, "taskall", await x.tasks.count())
-        setattr(x, "taskchecked", await x.tasks.filter(status=4).count())
-    print("-----!---------!------------!-")    
-    return {"mess": prlist}
+    
+    result = await ProjectService.give_list_projects(userid)
+    return {"mess": result}
 
 
 
@@ -84,7 +92,7 @@ async def create_projects(project: ProjectCreate):
 # , user=Depends(AD.protect_claim)
 @router.post("/updateproj",  status_code=status.HTTP_201_CREATED)
 #  ! 
-async def upd_my_projects(project: ProjectUpdate):
+async def upd_my_project(project: ProjectUpdate):
 
     project_field_update = project.dict(exclude={'users'}, exclude_unset=True)
     if len(project_field_update.keys()) > 1:
