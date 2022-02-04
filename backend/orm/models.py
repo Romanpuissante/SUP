@@ -276,6 +276,14 @@ class Assignment(Model, BaseId):
     datetimeend: Optional[datetime] = DateTime(nullable=True)
     timeneeded: Optional[int] = Integer(default=0)
 
+class AssignmentLoose(Model, BaseId):
+    class Meta(BaseMeta):
+        ...
+    task = ForeignKey(Task)
+    name: str = String(max_length=255)
+    user: Optional[User] = ForeignKey(User)    
+    timeneeded: Optional[int] = Integer(default=0)
+
 # *-------------------- Chat --------------------* #
 
 class AssignmentChat(Model, BaseId):

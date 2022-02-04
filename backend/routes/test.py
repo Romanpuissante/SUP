@@ -10,7 +10,7 @@ from orm.models import *
 from orm.schema import *
 from conf.log import logger
 from services.projects import ProjectService
-
+from datetime import timedelta
 router = APIRouter(
     prefix='/test',
     tags=['Всяческое тестирование'], 
@@ -20,21 +20,66 @@ router = APIRouter(
 
 # async def geto_user(id: int, use
 # AS = AD(ProjectService)
+@router.post("/deleteeassigment",  status_code=status.HTTP_201_CREATED)
+#  ! 
+async def updateassigment(assigmentdel: int):
+    old_assigment = await Assignment.objects.get(id = assigmentdel)
+    if old_assigment.status.id in [1,3,4]:
+        ...
+
+
+
+
 @router.post("/updateassigment",  status_code=status.HTTP_201_CREATED)
 #  ! 
 async def updateassigment(assigment: AssigmentUpdate):
-    print(assigment)
-    return {"mess": "ok"}
+      
+    old_assigment = await Assignment.objects.get(id = assigment.id)
+    # ! АЛАЛАЛАЛЛАЛАЛАЛЛАЛАЛАЛ
+    # Если попадает в статус "в работе"
+    userchanged = False if (int(assigment.user.id)==int(old_assigment.user.id)) else True
+    now = datetime.now()
+    
+    if old_assigment.status.id !=5:
+        if int(assigment.status.id) == 2  and not userchanged:
+            print(1)
+            assigment.timeneeded = old_assigment.timeneeded
+            assigment.datetimestart = now
+
+        elif assigment.status.id==3 and userchanged:
+            print(2)
+            assigment.timeneeded = 0
+            # Отправить в таблицу лузеров запись
+            await AssignmentLoose.objects.create(**old_assigment.dict(exclude='id'))
+
+        # Если на паузе
+        elif assigment.status.id ==3 and not userchanged:
+            print(3)
+            assigment.datetimestart = now
+            assigment.timeneeded = assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
+        # Если в статус проверки
+        elif assigment.status.id==4 and not userchanged:  
+            print(4) 
+            assigment.timeneeded = assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
+            
+        
+
+        await old_assigment.update(**assigment.dict())
+        return {"mess": old_assigment}
+    else:
+        return {"mess": "Поручение уже завершено"}
+    
+    
 
 
-@router.get("/getuser")
-#  ! 
-async def users():
-    users = await User.objects.values({"id", "first_name"})
+# @router.get("/getuser")
+# #  ! 
+# async def users():
+#     users = await User.objects.values({"id", "first_name"})
     
-    print(users)
+#     print(users)
     
-    return {"mess": users}
+#     return {"mess": users}
 
 
 @router.post("/createassigment",  status_code=status.HTTP_201_CREATED)

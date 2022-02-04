@@ -76,7 +76,7 @@ async def websocketwork(websocket: WebSocket, user=Depends(AD.protect_ws)):
         for user in project.users:  
             await pr.users.add(User(id = user.id, __pk_only__ = True))
     
-        project = await Project.objects.create(json.loads(message))
+        project = await Project.objects.create(json.loads(project))
         
 
 
