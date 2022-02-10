@@ -12,8 +12,9 @@ class ProjectService():
         project = Project.Meta.table
         task = Task.Meta.table
         pruser = ProjectUser.Meta.table
+        status = ProjectStatus.Meta.table
         
-        comleted_task = (
+        completed_task = (
             select(func.count(task.c.id))
             .where(task.c.status == 4)
             .where(task.c.project == project.c.id)
@@ -24,11 +25,13 @@ class ProjectService():
 
         q = (
             select(
-                func.count(task.c.id).label("all_tasks"), comleted_task.label("comleted_task"),  project.c.id, project.c.name, project.c.status, project.c.lastchanged, project.c.dateend
+                func.count(task.c.id).label("all_tasks"), completed_task.label("completed_tasks"),  project.c.id, project.c.name, status.c.name.label("status"), status.c.id.label("status_id"), project.c.lastchanged, project.c.dateend
             ).where(filter_user)
+            .join(status, project.c.status == status.c.id)
             .join(task, task.c.project == project.c.id, isouter=True)
-            .join(pruser, pruser.c.project == project.c.id)
-            .select_from(project).group_by(project.c.id)
+            .join(pruser, pruser.c.project == project.c.id, isouter=True)
+            
+            .select_from(project).group_by(project.c.id, status.c.id)
         )
 
         return [dict(x) for x in await database.fetch_all(q)]
@@ -38,8 +41,9 @@ class ProjectService():
 
         task = Task.Meta.table
         assigment = Assignment.Meta.table
+        status = TaskStatus.Meta.table
 
-        comleted_assigment = (
+        completed_assigment = (
             select(func.count(assigment.c.id))
             .where(assigment.c.status == 5)
             .where(assigment.c.task == task.c.id)
@@ -52,11 +56,12 @@ class ProjectService():
 
         q = (
             select(
-                func.count(assigment.c.id).label("all_assigment"), comleted_assigment.label("comleted_assigment"), task.c.id, task.c.name, task.c.status, task.c.dateend
+                func.count(assigment.c.id).label("all_assigments"), completed_assigment.label("completed_assigments"), task.c.id, task.c.name, status.c.name.label("status"), status.c.id.label("status_id"), task.c.dateend
             )
             .where(task.c.project == projectid)
+            .join(status, task.c.status == status.c.id)
             .join(assigment, assigment.c.task == task.c.id, isouter=True)
-            .select_from(task).group_by(task.c.id)
+            .select_from(task).group_by(task.c.id, status.c.id)
         )
 
         return [dict(x) for x in await database.fetch_all(q)]

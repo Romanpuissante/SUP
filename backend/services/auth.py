@@ -37,7 +37,7 @@ class AuthService(BaseService):
 
     async def auth(self, user_data: UserLogin, Authorize: AuthJWT):
 
-        user: User = await User.objects.filter(username=user_data.username).get_or_none()
+        user: User = await User.objects.select_related(["otdel", "rank"]).filter(username=user_data.username).get_or_none()
 
 
         if not user or not self.verify_password(user_data.password, user.password):

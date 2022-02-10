@@ -33,7 +33,7 @@ async def refresh(Authorize: AuthJWT = Depends()):
     Authorize.jwt_refresh_token_required()
     current_user = Authorize.get_jwt_subject()
 
-    user= await User.objects.filter(username=current_user).get()
+    user= await User.objects.select_related(["otdel", "rank"]).filter(username=current_user).get()
     new_access_token = AuthService.create_access(Authorize, user)
 
     return {"access_token": new_access_token}

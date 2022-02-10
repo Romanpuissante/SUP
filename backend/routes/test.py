@@ -35,7 +35,7 @@ async def updateassigment(assigmentdel: int):
 async def updateassigment(assigment: AssigmentUpdate):
       
     old_assigment = await Assignment.objects.get(id = assigment.id)
-    # ! АЛАЛАЛАЛЛАЛАЛАЛЛАЛАЛАЛ
+    
     # Если попадает в статус "в работе"
     userchanged = False if (int(assigment.user.id)==int(old_assigment.user.id)) else True
     now = datetime.now()
@@ -50,6 +50,7 @@ async def updateassigment(assigment: AssigmentUpdate):
             print(2)
             assigment.timeneeded = 0
             # Отправить в таблицу лузеров запись
+            old_assigment.timeneeded = old_assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
             await AssignmentLoose.objects.create(**old_assigment.dict(exclude='id'))
 
         # Если на паузе
@@ -59,10 +60,10 @@ async def updateassigment(assigment: AssigmentUpdate):
             assigment.timeneeded = assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
         # Если в статус проверки
         elif assigment.status.id==4 and not userchanged:  
-            print(4) 
-            assigment.timeneeded = assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
+            print(4)
             
-        
+            assigment.timeneeded = assigment.timeneeded + ((now - old_assigment.datetimestart).total_seconds())
+                    
 
         await old_assigment.update(**assigment.dict())
         return {"mess": old_assigment}
